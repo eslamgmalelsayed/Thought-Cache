@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "Thought Cache",
+    "description": "Capture your brilliant ideas anytime, anywhere"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "thoughts": "Thoughts",
+    "categories": "Categories",
+    "settings": "Settings",
+    "profile": "Profile",
+    "language": "Language"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "welcome": "Welcome to Thought Cache",
+    "createAccount": "Create your account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "thoughts": {
+    "title": "My Thoughts",
+    "add": "Add Thought",
+    "edit": "Edit Thought",
+    "delete": "Delete Thought",
+    "archive": "Archive",
+    "favorite": "Favorite",
+    "search": "Search thoughts...",
+    "empty": "No thoughts yet. Start by adding your first idea!",
+    "form": {
+      "title": "Title",
+      "content": "Content",
+      "category": "Category",
+      "tags": "Tags",
+      "color": "Color",
+      "save": "Save Thought",
+      "cancel": "Cancel"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "add": "Add Category",
+    "edit": "Edit Category",
+    "delete": "Delete Category",
+    "form": {
+      "name": "Category Name",
+      "color": "Color",
+      "icon": "Icon",
+      "save": "Save Category",
+      "cancel": "Cancel"
+    }
+  },
+  "tags": {
+    "add": "Add Tag",
+    "placeholder": "Enter tag name..."
+  },
+  "ui": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!",
+    "confirm": "Are you sure?",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "minLength": "Minimum {min} characters required",
+    "maxLength": "Maximum {max} characters allowed"
+  }
+} 
