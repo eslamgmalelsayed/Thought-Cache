@@ -207,7 +207,6 @@ const totalThoughts = ref(0);
 const favoriteCount = ref(0);
 const categoriesCount = ref(0);
 const hasMoreThoughts = ref(true);
-const currentPage = ref(1);
 
 // Options
 const categoryOptions = ref([
@@ -314,11 +313,19 @@ const clearFilters = () => {
   showArchived.value = false;
 };
 
-const viewThought = (thought: any) => {
+/**
+ * Navigate to view a specific thought
+ * @param {Object} thought - The thought object
+ */
+const viewThought = (thought) => {
   navigateTo(`/thoughts/${thought.id}`);
 };
 
-const toggleFavorite = (thought: any) => {
+/**
+ * Toggle the favorite status of a thought
+ * @param {Object} thought - The thought object
+ */
+const toggleFavorite = (thought) => {
   // Toggle favorite logic
   const index = thoughts.value.findIndex((t) => t.id === thought.id);
   if (index !== -1) {
@@ -327,16 +334,28 @@ const toggleFavorite = (thought: any) => {
   }
 };
 
-const editThought = (thought: any) => {
+/**
+ * Navigate to edit a specific thought
+ * @param {Object} thought - The thought object
+ */
+const editThought = (thought) => {
   navigateTo(`/thoughts/${thought.id}/edit`);
 };
 
-const deleteThought = (thought: any) => {
+/**
+ * Delete a specific thought
+ * @param {Object} thought - The thought object
+ */
+const deleteThought = (thought) => {
   // Delete logic with confirmation
   console.log("Delete thought:", thought.id);
 };
 
-const archiveThought = (thought: any) => {
+/**
+ * Toggle the archive status of a thought
+ * @param {Object} thought - The thought object
+ */
+const archiveThought = (thought) => {
   // Archive logic
   const index = thoughts.value.findIndex((t) => t.id === thought.id);
   if (index !== -1) {

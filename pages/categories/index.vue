@@ -445,15 +445,27 @@ const loadCategories = async () => {
   }
 };
 
-const viewCategory = (category: any) => {
+/**
+ * Navigate to view a specific category
+ * @param {Object} category - The category object
+ */
+const viewCategory = (category) => {
   navigateTo(`/categories/${category.id}`);
 };
 
-const editCategory = (category: any) => {
+/**
+ * Navigate to edit a specific category
+ * @param {Object} category - The category object
+ */
+const editCategory = (category) => {
   navigateTo(`/categories/${category.id}/edit`);
 };
 
-const deleteCategory = (category: any) => {
+/**
+ * Delete a specific category
+ * @param {Object} category - The category object
+ */
+const deleteCategory = (category) => {
   // Delete logic with confirmation
   console.log("Delete category:", category.id);
 };

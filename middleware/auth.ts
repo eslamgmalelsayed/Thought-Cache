@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware(async (to) => {
+export default defineNuxtRouteMiddleware(async () => {
     // Skip middleware in server-side rendering to avoid hydration issues
     if (import.meta.server) return
 

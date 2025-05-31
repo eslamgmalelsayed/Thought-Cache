@@ -1,7 +1,7 @@
 export const useClerkLoading = () => {
     const isLoading = ref(true)
     const hasError = ref(false)
-    const loadingTimeout = ref<NodeJS.Timeout>()
+    const loadingTimeout = ref()
 
     const startLoading = () => {
         isLoading.value = true
@@ -38,13 +38,13 @@ export const useClerkLoading = () => {
             const checkClerkReady = () => {
                 try {
                     // Check if Clerk is available and ready
-                    const clerk = (window as any)?.Clerk
+                    const clerk = window?.Clerk
                     if (clerk?.loaded) {
                         stopLoading()
                     } else {
                         setTimeout(checkClerkReady, 100)
                     }
-                } catch (error) {
+                } catch {
                     // Continue checking
                     setTimeout(checkClerkReady, 100)
                 }

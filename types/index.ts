@@ -121,10 +121,10 @@ export interface NavItem {
 }
 
 // Modal Types
-export interface ModalState {
+export interface ModalState<T = unknown> {
     isOpen: boolean
     type?: 'create' | 'edit' | 'delete' | 'view'
-    data?: any
+    data?: T
 }
 
 // Validation Types

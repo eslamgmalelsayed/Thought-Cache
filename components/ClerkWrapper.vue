@@ -41,20 +41,24 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  isSignUp?: boolean;
-  timeout?: number;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isSignUp: false,
-  timeout: 3000,
-});
+const props = withDefaults(
+  defineProps({
+    isSignUp: {
+      type: Boolean,
+      default: false,
+    },
+    timeout: {
+      type: Number,
+      default: 3000,
+    },
+  }),
+  {}
+);
 
 // Loading state management
 const isLoading = ref(true);
 const hasError = ref(false);
-const loadingTimeout = ref<NodeJS.Timeout>();
+const loadingTimeout = ref();
 
 const showSkeleton = computed(() => isLoading.value && !hasError.value);
 
@@ -89,7 +93,7 @@ onMounted(() => {
   // Check for Clerk readiness
   if (import.meta.client) {
     const checkClerk = () => {
-      const clerk = (window as any)?.Clerk;
+      const clerk = window?.Clerk;
       if (clerk?.loaded) {
         stopLoading();
       } else {

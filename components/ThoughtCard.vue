@@ -76,47 +76,29 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * @typedef {import('~/types').Thought} Thought
+ */
+
 // Props
-const props = defineProps<{
-  thought: any;
-}>();
+const _props = defineProps({
+  thought: {
+    type: Object,
+    required: true,
+  },
+});
 
 // Emits
-const emit = defineEmits<{
-  click: [thought: any];
-  "toggle-favorite": [thought: any];
-  edit: [thought: any];
-  delete: [thought: any];
-  archive: [thought: any];
-}>();
-
-// Action menu items
-const actionItems = computed(() => [
-  [
-    {
-      label: "Edit",
-      icon: "lucide:edit",
-      click: () => emit("edit", props.thought),
-    },
-  ],
-  [
-    {
-      label: "Archive",
-      icon: "lucide:archive",
-      click: () => emit("archive", props.thought),
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "lucide:trash",
-      click: () => emit("delete", props.thought),
-    },
-  ],
+const _emit = defineEmits([
+  "click",
+  "toggle-favorite",
+  "edit",
+  "delete",
+  "archive",
 ]);
 
 // Format date helper
-const formatDate = (date: Date | string) => {
+const formatDate = (date) => {
   const d = new Date(date);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - d.getTime());

@@ -10,7 +10,7 @@
           <UButton
             icon="lucide:menu"
             variant="ghost"
-            color="gray"
+            color="neutral"
             class="lg:hidden"
             @click="$emit('toggle-mobile-menu')"
           />
@@ -30,7 +30,7 @@
               v-model="searchQuery"
               :placeholder="$t('thoughts.search')"
               icon="lucide:search"
-              color="gray"
+              color="neutral"
               variant="outline"
               class="w-full"
               autocomplete="search"
@@ -64,13 +64,13 @@
           <UButton
             icon="lucide:bell"
             variant="ghost"
-            color="gray"
+            color="neutral"
             class="relative"
           >
             <template v-if="notificationCount > 0">
               <UBadge
                 :label="notificationCount.toString()"
-                color="red"
+                color="error"
                 variant="solid"
                 class="absolute -top-1 -right-1"
               />
@@ -86,7 +86,7 @@
 import type { BreadcrumbItem } from "@nuxt/ui";
 
 // Emits
-const emit = defineEmits(["toggle-mobile-menu"]);
+// const emit = defineEmits(["toggle-mobile-menu"]);
 
 // Search functionality
 const searchQuery = ref("");
@@ -155,7 +155,7 @@ const notificationCount = ref(0);
 // Initialize search from query params
 onMounted(() => {
   if (route.query.search) {
-    searchQuery.value = route.query.search;
+    searchQuery.value = route.query.search as string;
   }
 });
 </script>

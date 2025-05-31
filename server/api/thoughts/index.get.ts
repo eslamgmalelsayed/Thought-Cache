@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import prisma from '@/composables/usePrisma'
 
 // Query parameters schema
 const querySchema = z.object({
@@ -16,7 +15,7 @@ export default defineEventHandler(async (event) => {
     try {
         // Parse query parameters
         const query = await getQuery(event)
-        const { limit, page, search, categoryId, isArchived, isFavorite, sort } = querySchema.parse(query)
+        const { limit, page } = querySchema.parse(query)
 
         // For now, return mock data since we don't have auth setup yet
         const mockThoughts = [

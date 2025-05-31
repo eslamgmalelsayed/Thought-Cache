@@ -9,12 +9,12 @@
         </h1>
       </div>
       <UButton
-        v-if="$props.close"
+        v-if="props.close"
         icon="lucide:x"
         variant="ghost"
         color="gray"
         class="ml-auto lg:hidden"
-        @click="$emit('close')"
+        @click="emit('close')"
       />
     </div>
 
@@ -86,7 +86,7 @@
               :src="user.imageUrl"
               :alt="user.fullName || user.firstName || 'User'"
               class="w-full h-full object-cover"
-            >
+            />
           </div>
           <div
             v-else
@@ -130,14 +130,15 @@
 import { NAV_ITEMS, LANGUAGE_OPTIONS } from "@/utils/constants";
 
 // Props
-defineProps<{
-  close?: () => void;
-}>();
+const props = defineProps({
+  close: {
+    type: Function,
+    required: false,
+  },
+});
 
 // Emits
-defineEmits<{
-  close: [];
-}>();
+const emit = defineEmits(["close"]);
 
 // Clerk authentication
 const { user, signOut } = useAuth();

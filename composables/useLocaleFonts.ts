@@ -11,7 +11,7 @@ export const useLocaleFonts = () => {
     try {
         const { locale: i18nLocale } = useI18n()
         locale = i18nLocale
-    } catch (error) {
+    } catch {
         // Fallback if i18n is not available
         locale = ref('en')
     }
@@ -39,7 +39,7 @@ export const useLocaleFonts = () => {
     if (locale && typeof watch !== 'undefined') {
         try {
             watch(locale, updateDocumentFonts, { immediate: false })
-        } catch (error) {
+        } catch {
             // Silently fail if watch is not available
         }
     }

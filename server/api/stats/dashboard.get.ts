@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
     try {
         // For now, return mock stats data
         const stats = {

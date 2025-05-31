@@ -1,20 +1,19 @@
 import { PrismaClient } from '@prisma/client'
 
-// Global prisma instance for server-side usage
-declare global {
-    var __prisma: PrismaClient | undefined
-}
+const prisma: PrismaClient = (() => {
+    if (process.env.NODE_ENV === 'production') {
+        return new PrismaClient()
+    } else {
+        const globalForPrisma = global as typeof global & {
+            __prisma?: PrismaClient
+        }
 
-let prisma: PrismaClient
-
-if (process.env.NODE_ENV === 'production') {
-    prisma = new PrismaClient()
-} else {
-    if (!global.__prisma) {
-        global.__prisma = new PrismaClient()
+        if (!globalForPrisma.__prisma) {
+            globalForPrisma.__prisma = new PrismaClient()
+        }
+        return globalForPrisma.__prisma
     }
-    prisma = global.__prisma
-}
+})()
 
 export default prisma
 

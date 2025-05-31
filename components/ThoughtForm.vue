@@ -6,7 +6,7 @@
         for="thought-title"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
       >
-        {{ $t('thoughts.form.title') || 'Title' }}
+        {{ $t("thoughts.form.title") || "Title" }}
         <span class="text-red-500">*</span>
       </label>
       <UInput
@@ -17,7 +17,10 @@
         autocomplete="off"
         required
       />
-      <p v-if="errors.title" class="mt-1 text-sm text-red-600 dark:text-red-400">
+      <p
+        v-if="errors.title"
+        class="mt-1 text-sm text-red-600 dark:text-red-400"
+      >
         {{ errors.title }}
       </p>
     </div>
@@ -28,7 +31,7 @@
         for="thought-content"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
       >
-        {{ $t('thoughts.form.content') || 'Content' }}
+        {{ $t("thoughts.form.content") || "Content" }}
         <span class="text-red-500">*</span>
       </label>
       <UTextarea
@@ -40,7 +43,10 @@
         autocomplete="off"
         required
       />
-      <p v-if="errors.content" class="mt-1 text-sm text-red-600 dark:text-red-400">
+      <p
+        v-if="errors.content"
+        class="mt-1 text-sm text-red-600 dark:text-red-400"
+      >
         {{ errors.content }}
       </p>
     </div>
@@ -53,7 +59,7 @@
           for="thought-category"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
         >
-          {{ $t('thoughts.form.category') || 'Category' }}
+          {{ $t("thoughts.form.category") || "Category" }}
         </label>
         <USelectMenu
           v-model="formData.categoryId"
@@ -68,8 +74,10 @@
 
       <!-- Color -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {{ $t('thoughts.form.color') || 'Color' }}
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+        >
+          {{ $t("thoughts.form.color") || "Color" }}
         </label>
         <div class="flex flex-wrap gap-2">
           <button
@@ -80,7 +88,7 @@
               'w-8 h-8 rounded-full border-2 transition-all',
               formData.color === color.value
                 ? 'border-gray-400 ring-2 ring-gray-300'
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-gray-200 hover:border-gray-300',
             ]"
             :style="{ backgroundColor: color.value }"
             :title="color.name"
@@ -96,7 +104,7 @@
         for="thought-tags"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
       >
-        {{ $t('thoughts.form.tags') || 'Tags' }}
+        {{ $t("thoughts.form.tags") || "Tags" }}
       </label>
       <div class="space-y-2">
         <!-- Selected tags -->
@@ -115,7 +123,7 @@
             </template>
           </UBadge>
         </div>
-        
+
         <!-- Tag input -->
         <UInput
           id="thought-tags"
@@ -124,7 +132,7 @@
           icon="lucide:hash"
           autocomplete="off"
           @keyup.enter="addTag"
-          @keyup.comma.prevent="addTag"
+          @keyup="handleTagKeyup"
         />
         <p class="text-xs text-gray-500 dark:text-gray-400">
           Press Enter or comma to add tags
@@ -133,7 +141,9 @@
     </div>
 
     <!-- Form Actions -->
-    <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+    <div
+      class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700"
+    >
       <UButton
         type="button"
         variant="ghost"
@@ -153,89 +163,100 @@
 </template>
 
 <script setup lang="ts">
-import { THOUGHT_COLORS } from '@/utils/constants'
-import type { ThoughtFormData } from '@/types'
+import { THOUGHT_COLORS } from "@/utils/constants";
+import type { ThoughtFormData } from "@/types";
 
 // Props
 interface Props {
-  initialData?: Partial<ThoughtFormData>
-  loading?: boolean
-  categoryOptions?: Array<{ id: string; name: string }>
+  initialData?: Partial<ThoughtFormData>;
+  loading?: boolean;
+  categoryOptions?: Array<{ id: string; name: string }>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   categoryOptions: () => [],
-})
+});
 
 // Emits
 const emit = defineEmits<{
-  submit: [data: ThoughtFormData]
-  cancel: []
-}>()
+  submit: [data: ThoughtFormData];
+  cancel: [];
+}>();
 
 // Form data
 const formData = ref<ThoughtFormData>({
-  title: '',
-  content: '',
+  title: "",
+  content: "",
   color: THOUGHT_COLORS[0].value,
-  categoryId: '',
+  categoryId: "",
   tags: [],
   ...props.initialData,
-})
+});
 
 // Form state
-const errors = ref<Record<string, string>>({})
-const newTag = ref('')
+const errors = ref<Record<string, string>>({});
+const newTag = ref("");
 
 // Color options
-const colorOptions = THOUGHT_COLORS
+const colorOptions = THOUGHT_COLORS;
 
 // Methods
 const validateForm = (): boolean => {
-  errors.value = {}
+  errors.value = {};
 
   if (!formData.value.title.trim()) {
-    errors.value.title = 'Title is required'
+    errors.value.title = "Title is required";
   } else if (formData.value.title.length > 200) {
-    errors.value.title = 'Title cannot exceed 200 characters'
+    errors.value.title = "Title cannot exceed 200 characters";
   }
 
   if (!formData.value.content.trim()) {
-    errors.value.content = 'Content is required'
+    errors.value.content = "Content is required";
   } else if (formData.value.content.length > 5000) {
-    errors.value.content = 'Content cannot exceed 5000 characters'
+    errors.value.content = "Content cannot exceed 5000 characters";
   }
 
-  return Object.keys(errors.value).length === 0
-}
+  return Object.keys(errors.value).length === 0;
+};
 
 const addTag = () => {
-  const tag = newTag.value.trim().replace(',', '')
-  if (tag && !formData.value.tags.includes(tag) && formData.value.tags.length < 10) {
-    formData.value.tags.push(tag)
-    newTag.value = ''
+  const tag = newTag.value.trim().replace(",", "");
+  if (
+    tag &&
+    !formData.value.tags.includes(tag) &&
+    formData.value.tags.length < 10
+  ) {
+    formData.value.tags.push(tag);
+    newTag.value = "";
   }
-}
+};
+
+const handleTagKeyup = (event) => {
+  if (event.key === "," || event.code === "Comma") {
+    event.preventDefault();
+    addTag();
+  }
+};
 
 const removeTag = (index: number) => {
-  formData.value.tags.splice(index, 1)
-}
+  formData.value.tags.splice(index, 1);
+};
 
 const handleSubmit = () => {
   if (validateForm()) {
-    emit('submit', { ...formData.value })
+    emit("submit", { ...formData.value });
   }
-}
+};
 
 // Watch for initial data changes
 watch(
   () => props.initialData,
   (newData) => {
     if (newData) {
-      Object.assign(formData.value, newData)
+      Object.assign(formData.value, newData);
     }
   },
   { deep: true }
-)
-</script> 
+);
+</script>
