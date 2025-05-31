@@ -40,5 +40,4 @@
 
 <script setup lang="ts">
 // No props needed for skeleton
-fxcftggfhvzxc;
 </script>
