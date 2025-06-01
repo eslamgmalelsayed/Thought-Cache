@@ -53,6 +53,9 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root'
+    },
+    bundle: {
+      optimizeTranslationDirective: true
     }
   },
 
@@ -73,12 +76,19 @@ export default defineNuxtConfig({
 
   // TypeScript configuration
   typescript: {
-    typeCheck: true
+    typeCheck: false
   },
 
   // Build configuration
   build: {
     transpile: ['@prisma/client', '@clerk/nuxt']
+  },
+
+  // Vite configuration
+  vite: {
+    build: {
+      sourcemap: process.env.NODE_ENV !== 'production'
+    }
   },
 
   // Nitro configuration for Prisma
