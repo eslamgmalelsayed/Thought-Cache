@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+  ssr: true,
 
   modules: [
     '@nuxt/eslint',
@@ -93,8 +94,14 @@ export default defineNuxtConfig({
 
   // Nitro configuration for Prisma
   nitro: {
+    preset: 'netlify',
     experimental: {
       wasm: true
+    },
+    esbuild: {
+      options: {
+        target: 'es2020'
+      }
     }
   }
 })
