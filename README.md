@@ -108,10 +108,8 @@ thought-cache/
 │   └── css/
 │       └── main.css             # Global styles with Nuxt UI theme
 ├── 📁 components/
-│   ├── AppHeader.vue            # Global header with search and breadcrumbs
-│   ├── AppSidebar.vue           # Navigation sidebar with user profile
+│   ├── AppHeader.vue            # Global header with logo, search, and user menu
 │   ├── AppHeaderSkeleton.vue    # Loading state for header
-│   ├── AppSidebarSkeleton.vue   # Loading state for sidebar
 │   ├── AuthFormSkeleton.vue     # Loading state for Clerk auth forms
 │   ├── CategoryForm.vue         # Form for creating/editing categories
 │   ├── ClerkWrapper.vue         # Wrapper with loading states for Clerk
@@ -142,9 +140,8 @@ thought-cache/
 │   │   ├── index.vue            # Categories list with skeletons
 │   │   └── new.vue              # Create new category
 │   ├── thoughts/
-│   │   ├── index.vue            # Thoughts list with masonry and skeletons
 │   │   └── new.vue              # Create new thought
-│   ├── index.vue                # Dashboard with staggered loading
+│   ├── index.vue                # Dashboard with thoughts, search, filters, and stats
 │   ├── settings.vue             # User settings with multiple forms
 │   ├── sign-in.vue              # Clerk sign-in with skeleton
 │   └── sign-up.vue              # Clerk sign-up with skeleton
@@ -181,13 +178,12 @@ The app uses a comprehensive design system with:
 - **ThoughtCard**: Beautiful note cards with color coding and masonry layout
 - **StatCard**: Dashboard statistics display with icons
 - **QuickActionCard**: Action shortcuts with hover effects
-- **AppSidebar**: Navigation with theme/language toggles and user profile
-- **AppHeader**: Search, breadcrumbs, and action buttons
+- **AppHeader**: Logo, search, user menu with preferences and actions
 
 ### Skeleton Loading Components
 
 - **AuthFormSkeleton**: Realistic loading state for Clerk authentication forms
-- **UserProfileSkeleton**: Loading state for user profile in sidebar
+- **UserProfileSkeleton**: Loading state for user profile
 - **ThoughtCardSkeleton**: Masonry-compatible loading cards
 - **StatCardSkeleton**: Statistics card placeholders
 - **FormSkeleton**: Configurable form loading states
@@ -226,7 +222,7 @@ The app uses a comprehensive design system with:
 ### Clerk Integration
 
 - **Authentication Skeletons**: Loading states for sign-in/sign-up forms
-- **User Profile Loading**: Skeleton in sidebar while user data loads
+- **User Profile Loading**: Skeleton for user data in header dropdown
 - **Smart Detection**: Automatic Clerk readiness detection
 - **Timeout Protection**: Prevents infinite loading states
 

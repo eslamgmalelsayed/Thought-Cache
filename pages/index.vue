@@ -4,12 +4,84 @@
     <div
       class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg p-6 text-white"
     >
-      <h1 class="text-2xl font-bold">
-        {{ $t("auth.welcome") }}
-      </h1>
-      <p class="mt-2 text-primary-100">
-        {{ $t("app.description") }}
-      </p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold">
+            {{ $t("auth.welcome") }}
+          </h1>
+          <p class="mt-2 text-primary-100">
+            {{ $t("app.description") }}
+          </p>
+        </div>
+        <UModal>
+          <UButton
+            color="white"
+            variant="solid"
+            icon="lucide:plus"
+            :label="$t('thoughts.add') || 'Add Thought'"
+            class="hidden sm:flex cursor-pointer"
+          />
+
+          <template #content>
+            <UCard
+              :ui="{
+                ring: '',
+                divide: 'divide-y divide-gray-200 dark:divide-gray-700',
+              }"
+            >
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    {{ $t("thoughts.add") || "Add New Thought" }}
+                  </h3>
+                </div>
+              </template>
+
+              <ThoughtForm
+                :loading="savingThought"
+                :category-options="categoryOptions"
+                @submit="handleAddThought"
+              />
+            </UCard>
+          </template>
+        </UModal>
+
+        <UModal>
+          <UButton
+            color="white"
+            variant="solid"
+            icon="lucide:plus"
+            class="sm:hidden cursor-pointer"
+          />
+
+          <template #content>
+            <UCard
+              :ui="{
+                ring: '',
+                divide: 'divide-y divide-gray-200 dark:divide-gray-700',
+              }"
+            >
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <h3
+                    class="text-lg font-semibold text-gray-900 dark:text-white"
+                  >
+                    {{ $t("thoughts.add") || "Add New Thought" }}
+                  </h3>
+                </div>
+              </template>
+
+              <ThoughtForm
+                :loading="savingThought"
+                :category-options="categoryOptions"
+                @submit="handleAddThought"
+              />
+            </UCard>
+          </template>
+        </UModal>
+      </div>
     </div>
 
     <!-- Statistics cards -->
@@ -47,98 +119,131 @@
       </template>
     </div>
 
-    <!-- Quick actions -->
+    <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Quick Actions
-      </h2>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <template v-if="loadingActions">
-          <QuickActionCardSkeleton
-            v-for="i in 3"
-            :key="`action-skeleton-${i}`"
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <UInput
+            v-model="searchQuery"
+            :placeholder="$t('thoughts.search') || 'Search thoughts...'"
+            icon="lucide:search"
+            color="gray"
+            variant="outline"
+            :loading="searching"
+            autocomplete="search"
           />
-        </template>
-        <template v-else>
-          <QuickActionCard
-            :title="$t('thoughts.add')"
-            description="Capture a new brilliant idea"
-            icon="lucide:plus"
-            color="primary"
-            to="/thoughts/new"
-          />
-          <QuickActionCard
-            :title="$t('categories.add')"
-            description="Organize your thoughts better"
-            icon="lucide:folder-plus"
-            color="green"
-            to="/categories/new"
-          />
-          <QuickActionCard
-            title="Browse All"
-            description="View all your thoughts"
-            icon="lucide:layout-grid"
-            color="blue"
-            to="/thoughts"
-          />
-        </template>
-      </div>
-    </div>
-
-    <!-- Recent thoughts -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Recent Thoughts
-        </h2>
-        <UButton
-          v-if="!loadingThoughts"
-          :to="'/thoughts'"
-          variant="ghost"
-          color="primary"
-          :label="'View All'"
-          trailing-icon="lucide:arrow-right"
-        />
-        <USkeleton v-else class="h-8 w-20" />
-      </div>
-
-      <div v-if="loadingThoughts" class="space-y-4">
-        <div
-          class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4"
-        >
-          <ThoughtCardSkeleton
-            v-for="i in 6"
-            :key="`thought-skeleton-${i}`"
-            class="break-inside-avoid mb-4"
+        </div>
+        <div class="flex gap-2">
+          <USelectMenu
+            v-model="selectedCategory"
+            :options="categoryOptions"
+            placeholder="All Categories"
+            value-attribute="id"
+            option-attribute="name"
+            icon="lucide:tag"
           />
         </div>
       </div>
+    </div>
 
-      <div v-else-if="recentThoughts.length === 0" class="text-center py-8">
-        <UIcon
-          name="lucide:lightbulb"
-          class="mx-auto h-12 w-12 text-gray-400"
+    <!-- Loading State -->
+    <div v-if="loadingThoughts" class="space-y-6">
+      <!-- Thoughts grid skeleton -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
+        <ThoughtCardSkeleton
+          v-for="i in 12"
+          :key="`skeleton-${i}`"
+          class="h-80"
         />
-        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-          {{ $t("thoughts.empty") }}
-        </h3>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="filteredThoughts.length === 0" class="text-center py-12">
+      <UIcon name="lucide:lightbulb" class="mx-auto h-12 w-12 text-gray-400" />
+      <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+        {{ searchQuery ? "No thoughts found" : $t("thoughts.empty") }}
+      </h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        {{
+          searchQuery
+            ? "Try adjusting your search or filters"
+            : "Start by adding your first brilliant idea!"
+        }}
+      </p>
+      <UModal>
         <UButton
-          :to="'/thoughts/new'"
           color="primary"
-          class="mt-4"
-          :label="$t('thoughts.add')"
+          class="mt-4 cursor-pointer"
+          icon="lucide:plus"
+          :label="$t('thoughts.add') || 'Add Thought'"
+        />
+
+        <template #content>
+          <UCard
+            :ui="{
+              ring: '',
+              divide: 'divide-y divide-gray-200 dark:divide-gray-700',
+            }"
+          >
+            <template #header>
+              <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  {{ $t("thoughts.add") || "Add New Thought" }}
+                </h3>
+              </div>
+            </template>
+
+            <ThoughtForm
+              :loading="savingThought"
+              :category-options="categoryOptions"
+              @submit="handleAddThought"
+            />
+          </UCard>
+        </template>
+      </UModal>
+    </div>
+
+    <!-- Thoughts Grid -->
+    <div v-else class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          {{ searchQuery ? "Search Results" : "Recent Thoughts" }}
+        </h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ filteredThoughts.length }}
+          {{ filteredThoughts.length === 1 ? "thought" : "thoughts" }}
+        </p>
+      </div>
+
+      <!-- Thoughts Grid -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
+        <ThoughtCard
+          v-for="thought in filteredThoughts"
+          :key="thought.id"
+          :thought="thought"
+          class="h-80"
+          @toggle-favorite="toggleFavorite"
+          @edit="editThought"
+          @delete="deleteThought"
+          @archive="archiveThought"
         />
       </div>
 
-      <div
-        v-else
-        class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4"
-      >
-        <ThoughtCard
-          v-for="thought in recentThoughts"
-          :key="thought.id"
-          :thought="thought"
-          class="break-inside-avoid mb-4"
+      <!-- Load More -->
+      <div v-if="hasMoreThoughts" class="text-center">
+        <UButton
+          variant="outline"
+          color="gray"
+          :loading="loadingMore"
+          icon="lucide:chevron-down"
+          label="Load More"
+          class="cursor-pointer"
+          @click="loadMore"
         />
       </div>
     </div>
@@ -156,8 +261,21 @@ definePageMeta({
 const loadingStats = ref(true);
 const loadingThoughts = ref(true);
 const loadingActions = ref(true);
+const searching = ref(false);
+const loadingMore = ref(false);
+const savingThought = ref(false);
 
+// Search and filter state
+const searchQuery = ref("");
+const selectedCategory = ref(null);
+const showFavorites = ref(false);
+const showArchived = ref(false);
+
+// Data
+const thoughts = ref([]);
 const recentThoughts = ref([]);
+const hasMoreThoughts = ref(true);
+
 const stats = ref({
   totalThoughts: 0,
   totalCategories: 0,
@@ -167,17 +285,61 @@ const stats = ref({
   monthlyTrend: "+8%",
 });
 
+// Options
+const categoryOptions = ref([
+  { id: null, name: "All Categories" },
+  { id: "1", name: "Personal" },
+  { id: "2", name: "Work" },
+  { id: "3", name: "Ideas" },
+]);
+
+// Computed
+const filteredThoughts = computed(() => {
+  let filtered = [...thoughts.value];
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(
+      (thought) =>
+        thought.title.toLowerCase().includes(query) ||
+        thought.content.toLowerCase().includes(query)
+    );
+  }
+
+  if (selectedCategory.value) {
+    filtered = filtered.filter(
+      (thought) => thought.categoryId === selectedCategory.value
+    );
+  }
+
+  if (showFavorites.value) {
+    filtered = filtered.filter((thought) => thought.isFavorite);
+  }
+
+  if (!showArchived.value) {
+    filtered = filtered.filter((thought) => !thought.isArchived);
+  }
+
+  return filtered;
+});
+
 // Load dashboard data
 const loadDashboardData = async () => {
   try {
     // Fetch recent thoughts and stats with realistic loading simulation
     const [thoughtsResponse, statsResponse] = await Promise.all([
-      $fetch("/api/thoughts?limit=6&sort=createdAt:desc"),
+      $fetch("/api/thoughts?limit=20&sort=createdAt:desc"),
       $fetch("/api/stats/dashboard"),
     ]);
 
+    thoughts.value = thoughtsResponse.data || [];
     recentThoughts.value = thoughtsResponse.data || [];
-    stats.value = { ...stats.value, ...statsResponse.data };
+    stats.value = {
+      ...stats.value,
+      ...statsResponse.data,
+      totalThoughts: thoughts.value.length,
+      favoriteThoughts: thoughts.value.filter((t) => t.isFavorite).length,
+    };
 
     // Simulate staggered loading for better UX
     setTimeout(() => {
@@ -200,8 +362,135 @@ const loadDashboardData = async () => {
   }
 };
 
+const loadMore = async () => {
+  loadingMore.value = true;
+
+  // Simulate loading more thoughts
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // In real implementation, you'd fetch the next page
+  hasMoreThoughts.value = false;
+  loadingMore.value = false;
+};
+
+/**
+ * Toggle the favorite status of a thought
+ * @param {Object} thought - The thought object
+ */
+const toggleFavorite = (thought) => {
+  // Toggle favorite logic
+  const index = thoughts.value.findIndex((t) => t.id === thought.id);
+  if (index !== -1) {
+    thoughts.value[index].isFavorite = !thoughts.value[index].isFavorite;
+    stats.value.favoriteThoughts = thoughts.value.filter(
+      (t) => t.isFavorite
+    ).length;
+  }
+};
+
+/**
+ * Navigate to edit a specific thought
+ * @param {Object} thought - The thought object
+ */
+const editThought = (thought) => {
+  navigateTo(`/thoughts/${thought.id}/edit`);
+};
+
+/**
+ * Delete a specific thought
+ * @param {Object} thought - The thought object
+ */
+const deleteThought = (thought) => {
+  // Delete logic with confirmation
+  console.log("Delete thought:", thought.id);
+};
+
+/**
+ * Toggle the archive status of a thought
+ * @param {Object} thought - The thought object
+ */
+const archiveThought = (thought) => {
+  // Archive logic
+  const index = thoughts.value.findIndex((t) => t.id === thought.id);
+  if (index !== -1) {
+    thoughts.value[index].isArchived = !thoughts.value[index].isArchived;
+  }
+};
+
+/**
+ * Handle adding a new thought
+ * @param {Object} data - The thought form data
+ */
+const handleAddThought = async (data) => {
+  try {
+    savingThought.value = true;
+
+    // Simulate API call to create thought
+    console.log("Creating thought:", data);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Create new thought object
+    const newThought = {
+      id: Date.now().toString(),
+      title: data.title,
+      content: data.content,
+      color: data.color,
+      isArchived: false,
+      isFavorite: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: "user_1",
+      categoryId: data.categoryId || null,
+      category: data.categoryId
+        ? categoryOptions.value.find((c) => c.id === data.categoryId)
+        : null,
+      tags: data.tags.map((tagName, index) => ({
+        thoughtId: Date.now().toString(),
+        tagId: `tag_${Date.now()}_${index}`,
+        tag: {
+          id: `tag_${Date.now()}_${index}`,
+          name: tagName,
+          createdAt: new Date(),
+        },
+      })),
+    };
+
+    // Add to thoughts array
+    thoughts.value.unshift(newThought);
+
+    // Update stats
+    stats.value.totalThoughts = thoughts.value.length;
+    stats.value.favoriteThoughts = thoughts.value.filter(
+      (t) => t.isFavorite
+    ).length;
+
+    // Show success message (you could use a toast notification here)
+    console.log("Thought created successfully!");
+  } catch (error) {
+    console.error("Failed to create thought:", error);
+    // Handle error (show error message)
+  } finally {
+    savingThought.value = false;
+  }
+};
+
+// Watchers
+watch(searchQuery, async (newQuery) => {
+  if (newQuery) {
+    searching.value = true;
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Debounce
+    searching.value = false;
+  }
+});
+
 // Load data on mount
 onMounted(() => {
+  // Check for search query from URL params
+  const route = useRoute();
+  if (route.query.search) {
+    searchQuery.value = String(route.query.search);
+  }
+
   loadDashboardData();
 });
 </script>

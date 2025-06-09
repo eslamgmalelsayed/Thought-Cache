@@ -85,7 +85,7 @@
             :key="color.value"
             type="button"
             :class="[
-              'w-8 h-8 rounded-full border-2 transition-all',
+              'w-8 h-8 rounded-full border-2 transition-all cursor-pointer',
               formData.color === color.value
                 ? 'border-gray-400 ring-2 ring-gray-300'
                 : 'border-gray-200 hover:border-gray-300',
@@ -142,21 +142,15 @@
 
     <!-- Form Actions -->
     <div
-      class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700"
+      class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700"
     >
-      <UButton
-        type="button"
-        variant="ghost"
-        color="gray"
-        :label="$t('ui.cancel') || 'Cancel'"
-        @click="$emit('cancel')"
-      />
       <UButton
         type="submit"
         color="primary"
         :loading="loading"
         :label="$t('thoughts.form.save') || 'Save Thought'"
         icon="lucide:save"
+        class="cursor-pointer"
       />
     </div>
   </form>
@@ -181,7 +175,6 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 const emit = defineEmits<{
   submit: [data: ThoughtFormData];
-  cancel: [];
 }>();
 
 // Form data

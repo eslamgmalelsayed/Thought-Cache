@@ -62,7 +62,7 @@ export default defineEventHandler(async (event) => {
             {
                 id: '3',
                 title: '13 Things You Should Give Up If You Want To Be a Successful UX Designer',
-                content: 'A comprehensive guide to becoming a better UX designer by letting go of certain habits and mindsets.',
+                content: 'A comprehensive guide to becoming a better UX designer by letting go of certain habits and mindsets. A comprehensive guide to becoming a better UX designer by letting go of certain habits and mindsets. A comprehensive guide to becoming a better UX designer by letting go of certain habits and mindsets.',
                 color: '#ef4444',
                 isArchived: false,
                 isFavorite: false,

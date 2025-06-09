@@ -6,76 +6,142 @@
       <div class="flex h-16 justify-between">
         <!-- Left section -->
         <div class="flex items-center">
-          <!-- Mobile menu button -->
-          <UButton
-            icon="lucide:menu"
-            variant="ghost"
-            color="neutral"
-            class="lg:hidden"
-            @click="$emit('toggle-mobile-menu')"
-          />
-
-          <!-- Breadcrumbs -->
-          <nav class="hidden lg:flex items-center ml-4">
-            <UBreadcrumb :items="breadcrumbItems" />
-          </nav>
+          <!-- App logo/title -->
+          <div class="flex items-center">
+            <UIcon name="lucide:lightbulb" class="h-8 w-8 text-primary-600" />
+            <h1 class="ml-3 text-xl font-bold text-gray-900 dark:text-white">
+              {{ $t("app.name") || "Thought Cache" }}
+            </h1>
+          </div>
         </div>
 
         <!-- Center section - Search -->
-        <div
-          class="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end"
-        >
-          <div class="w-full max-w-lg lg:max-w-xs">
-            <UInput
-              v-model="searchQuery"
-              :placeholder="$t('thoughts.search')"
-              icon="lucide:search"
-              color="neutral"
-              variant="outline"
-              class="w-full"
-              autocomplete="search"
-              @keyup.enter="handleSearch"
-            />
-          </div>
-        </div>
 
         <!-- Right section -->
         <div class="flex items-center space-x-4">
           <!-- Quick actions -->
           <UButton
-            :to="'/thoughts/new'"
             icon="lucide:plus"
             color="primary"
             variant="solid"
             :label="$t('thoughts.add')"
             class="hidden sm:flex"
+            @click="emit('add-thought')"
           />
 
           <!-- Mobile add button -->
           <UButton
-            :to="'/thoughts/new'"
             icon="lucide:plus"
             color="primary"
             variant="solid"
             class="sm:hidden"
+            @click="emit('add-thought')"
           />
 
-          <!-- Notifications -->
-          <UButton
-            icon="lucide:bell"
-            variant="ghost"
-            color="neutral"
-            class="relative"
-          >
-            <template v-if="notificationCount > 0">
-              <UBadge
-                :label="notificationCount.toString()"
-                color="error"
-                variant="solid"
-                class="absolute -top-1 -right-1"
-              />
-            </template>
-          </UButton>
+          <!-- User Avatar & Preferences -->
+          <div v-if="isLoaded" class="relative">
+            <!-- Avatar Button -->
+            <UButton
+              variant="ghost"
+              color="gray"
+              class="p-1 cursor-pointer"
+              @click="toggleUserMenu"
+            >
+              <div class="flex items-center">
+                <div
+                  v-if="avatarUrl"
+                  class="h-8 w-8 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-600"
+                >
+                  <img
+                    :src="avatarUrl"
+                    :alt="userDisplayName"
+                    class="w-full h-full object-cover"
+                    @error="onImageError"
+                    @load="onImageLoad"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600"
+                >
+                  <span class="text-white text-sm font-medium">
+                    {{ userInitials }}
+                  </span>
+                </div>
+              </div>
+            </UButton>
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="showUserMenu"
+              class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+            >
+              <div class="p-3">
+                <!-- Theme Toggle -->
+                <div class="flex items-center justify-between py-2">
+                  <div class="flex items-center">
+                    <UIcon
+                      :name="themeIcon"
+                      class="h-4 w-4 text-gray-500 mr-2"
+                    />
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                      {{ t("ui.theme.system") || "Theme" }}
+                    </span>
+                  </div>
+                  <UButton
+                    variant="outline"
+                    color="gray"
+                    size="xs"
+                    :icon="themeIcon"
+                    @click="toggleTheme"
+                    class="capitalize cursor-pointer"
+                  >
+                    {{ colorMode.preference }}
+                  </UButton>
+                </div>
+
+                <!-- Language Toggle -->
+                <div class="flex items-center justify-between py-2">
+                  <div class="flex items-center">
+                    <UIcon
+                      name="lucide:globe"
+                      class="h-4 w-4 text-gray-500 mr-2"
+                    />
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                      {{ t("nav.language") || "Language" }}
+                    </span>
+                  </div>
+                  <UButton
+                    variant="outline"
+                    color="gray"
+                    size="xs"
+                    @click="toggleLanguage"
+                    class="min-w-[60px] cursor-pointer"
+                  >
+                    {{ currentLanguage?.label || "EN" }}
+                  </UButton>
+                </div>
+
+                <hr class="my-2 border-gray-200 dark:border-gray-700" />
+
+                <!-- Sign Out -->
+                <UButton
+                  variant="ghost"
+                  color="red"
+                  class="w-full justify-start cursor-pointer"
+                  icon="lucide:log-out"
+                  @click="handleSignOut"
+                >
+                  {{ t("auth.signOut") || "Sign Out" }}
+                </UButton>
+              </div>
+            </div>
+          </div>
+          <!-- Loading state -->
+          <div
+            v-else
+            class="h-8 w-8 rounded-full bg-gray-300 animate-pulse"
+          ></div>
         </div>
       </div>
     </div>
@@ -83,79 +149,169 @@
 </template>
 
 <script setup lang="ts">
-import type { BreadcrumbItem } from "@nuxt/ui";
+import { LANGUAGE_OPTIONS } from "@/utils/constants";
 
-// Emits
-// const emit = defineEmits(["toggle-mobile-menu"]);
+// User authentication
+const { user, signOut, isLoaded } = useAuth();
 
-// Search functionality
-const searchQuery = ref("");
-const router = useRouter();
-const route = useRoute();
+// User menu state
+const showUserMenu = ref(false);
 
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    router.push({
-      path: "/thoughts",
-      query: { search: searchQuery.value.trim() },
-    });
-  }
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value;
 };
 
-// Breadcrumbs
-const breadcrumbItems = computed((): BreadcrumbItem[] => {
-  const pathSegments = route.path.split("/").filter(Boolean);
-  const items: BreadcrumbItem[] = [
-    {
-      label: "Dashboard",
-      to: "/",
-      icon: "i-lucide-home",
-    },
-  ];
-
-  let currentPath = "";
-  pathSegments.forEach((segment, index) => {
-    currentPath += `/${segment}`;
-
-    // Convert segment to readable label
-    const label =
-      segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
-
-    // Get appropriate icon for different sections
-    let icon = "i-lucide-folder";
-    if (segment === "thoughts") {
-      icon = "i-lucide-lightbulb";
-    } else if (segment === "categories") {
-      icon = "i-lucide-tag";
-    } else if (segment === "profile") {
-      icon = "i-lucide-user";
-    } else if (segment === "settings") {
-      icon = "i-lucide-settings";
-    }
-
-    const item: BreadcrumbItem = {
-      label,
-      icon,
-    };
-
-    // Only add 'to' property if not the last item
-    if (index < pathSegments.length - 1) {
-      item.to = currentPath;
-    }
-
-    items.push(item);
+// Close menu when clicking outside
+if (import.meta.client) {
+  onMounted(() => {
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!target.closest(".relative")) {
+        showUserMenu.value = false;
+      }
+    });
   });
+}
 
-  return items;
-});
+// Debug user object
+watch(
+  () => user?.value,
+  (newUser) => {
+    try {
+      if (newUser) {
+        console.log("User object:", newUser);
+        console.log("Image URLs:", {
+          imageUrl: newUser.imageUrl,
+          profileImageUrl: newUser.profileImageUrl,
+          hasImage: !!(newUser.imageUrl || newUser.profileImageUrl),
+        });
+      }
+    } catch (error) {
+      console.error("Error in user watcher:", error);
+    }
+  },
+  { immediate: true }
+);
 
-// Notifications (placeholder)
-const notificationCount = ref(0);
+// Image loading handlers
+const onImageError = (event) => {
+  console.error("Avatar image failed to load:", event.target.src);
+  console.log("User object at error:", user.value);
+};
 
-// Initialize search from query params
-onMounted(() => {
-  if (route.query.search) {
-    searchQuery.value = route.query.search as string;
+const onImageLoad = (event) => {
+  console.log("Avatar image loaded successfully:", event.target.src);
+};
+
+// Computed properties for user display
+const avatarUrl = computed(() => {
+  if (!user || !user.value) return null;
+
+  try {
+    // Try different possible image properties from Clerk
+    return (
+      user.value.imageUrl ||
+      user.value.profileImageUrl ||
+      user.value.profileImageURL ||
+      user.value.avatar ||
+      user.value.picture ||
+      null
+    );
+  } catch (error) {
+    console.error("Error accessing user avatar:", error);
+    return null;
   }
 });
+
+const userDisplayName = computed(() => {
+  if (!user || !user.value) return "User";
+
+  try {
+    return (
+      user.value.fullName ||
+      user.value.firstName ||
+      user.value.name ||
+      user.value.username ||
+      "User"
+    );
+  } catch (error) {
+    console.error("Error accessing user display name:", error);
+    return "User";
+  }
+});
+
+const userInitials = computed(() => {
+  if (!user || !user.value) return "U";
+
+  try {
+    const firstName = user.value.firstName || "";
+    const lastName = user.value.lastName || "";
+
+    if (firstName && lastName) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    } else if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    } else if (user.value.fullName) {
+      const names = user.value.fullName.split(" ");
+      if (names.length >= 2) {
+        return `${names[0].charAt(0)}${names[names.length - 1].charAt(
+          0
+        )}`.toUpperCase();
+      }
+      return names[0].charAt(0).toUpperCase();
+    } else if (user.value.username) {
+      return user.value.username.charAt(0).toUpperCase();
+    }
+
+    return "U";
+  } catch (error) {
+    console.error("Error accessing user initials:", error);
+    return "U";
+  }
+});
+
+// Theme management
+const colorMode = useColorMode();
+const themeIcon = computed(() => {
+  switch (colorMode.value) {
+    case "light":
+      return "lucide:sun";
+    case "dark":
+      return "lucide:moon";
+    default:
+      return "lucide:monitor";
+  }
+});
+
+const toggleTheme = () => {
+  const themes = ["light", "dark", "system"];
+  const currentIndex = themes.indexOf(colorMode.preference);
+  const nextIndex = (currentIndex + 1) % themes.length;
+  colorMode.preference = themes[nextIndex];
+};
+
+// Language management
+const { locale, setLocale, t } = useI18n();
+
+const currentLanguage = computed(() => {
+  return (
+    LANGUAGE_OPTIONS.find((lang) => lang.value === locale.value) ||
+    LANGUAGE_OPTIONS[0]
+  );
+});
+
+const toggleLanguage = () => {
+  const newLocale = locale.value === "en" ? "ar" : "en";
+  setLocale(newLocale);
+};
+
+// Sign out handler
+const handleSignOut = async () => {
+  try {
+    await signOut();
+    await navigateTo("/sign-in");
+  } catch (error) {
+    console.error("Sign out error:", error);
+  }
+};
 </script>

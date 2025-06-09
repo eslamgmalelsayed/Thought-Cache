@@ -6,15 +6,11 @@
       <div class="flex h-16 justify-between animate-pulse">
         <!-- Left section -->
         <div class="flex items-center">
-          <!-- Mobile menu button -->
-          <USkeleton class="h-8 w-8 rounded lg:hidden mr-4" />
-
-          <!-- Breadcrumbs -->
-          <nav class="hidden lg:flex items-center ml-4 space-x-2">
-            <USkeleton class="h-4 w-16" />
-            <USkeleton class="h-3 w-3 rounded-full" />
-            <USkeleton class="h-4 w-20" />
-          </nav>
+          <!-- App logo/title -->
+          <div class="flex items-center">
+            <USkeleton class="h-8 w-8 rounded mr-3" />
+            <USkeleton class="h-6 w-32" />
+          </div>
         </div>
 
         <!-- Center section - Search -->
@@ -34,8 +30,8 @@
           <!-- Mobile add button -->
           <USkeleton class="h-10 w-10 rounded-md sm:hidden" />
 
-          <!-- Notifications -->
-          <USkeleton class="h-8 w-8 rounded" />
+          <!-- User Avatar -->
+          <USkeleton class="h-8 w-8 rounded-full" />
         </div>
       </div>
     </div>

@@ -1,24 +1,31 @@
 <template>
   <div
-    class="thought-card rounded-lg p-4 shadow-sm cursor-pointer"
+    class="thought-card rounded-lg p-4 shadow-sm h-full flex flex-col"
     :style="{ backgroundColor: thought.color }"
-    @click="$emit('click', thought)"
   >
     <!-- Header with actions -->
-    <div class="flex items-start justify-between mb-3">
-      <div class="flex-1">
-        <h3 class="text-white font-medium text-lg leading-tight mb-2">
-          {{ thought.title }}
+    <div class="flex items-start justify-between mb-3 flex-shrink-0">
+      <div class="flex-1 min-w-0">
+        <h3
+          class="text-white font-medium text-lg leading-tight mb-2 truncate"
+          :title="thought.title"
+        >
+          {{ truncateTitle(thought.title) }}
         </h3>
       </div>
 
       <!-- Action buttons -->
-      <div class="flex items-center space-x-1 ml-2">
+      <div class="flex items-center space-x-1 ml-2 flex-shrink-0">
         <UButton
-          :icon="thought.isFavorite ? 'lucide:heart-filled' : 'lucide:heart'"
+          :icon="thought.isFavorite ? 'lucide:heart' : 'lucide:heart'"
+          :class="{
+            'text-red-300': thought.isFavorite,
+            'text-white/70': !thought.isFavorite,
+          }"
           variant="ghost"
           color="white"
           size="xs"
+          class="cursor-pointer"
           @click.stop="$emit('toggle-favorite', thought)"
         />
         <UButton
@@ -26,18 +33,21 @@
           variant="ghost"
           color="white"
           size="xs"
+          class="cursor-pointer"
           @click.stop
         />
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="text-white/90 text-sm mb-4 line-clamp-4">
-      {{ thought.content }}
+    <!-- Content (Scrollable) -->
+    <div class="flex-1 overflow-y-auto mb-4 min-h-0">
+      <div class="text-white/90 text-sm leading-relaxed">
+        {{ thought.content }}
+      </div>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between">
+    <div class="flex-shrink-0 space-y-3">
       <!-- Tags -->
       <div class="flex flex-wrap gap-1">
         <span
@@ -55,22 +65,26 @@
         </span>
       </div>
 
-      <!-- Date -->
-      <div class="text-white/70 text-xs">
-        {{ formatDate(thought.createdAt) }}
-      </div>
-    </div>
+      <!-- Bottom row with category and date -->
+      <div class="flex items-center justify-between">
+        <!-- Category indicator -->
+        <div v-if="thought.category" class="flex items-center">
+          <UIcon
+            v-if="thought.category.icon"
+            :name="thought.category.icon"
+            class="h-4 w-4 text-white/70 mr-1"
+          />
+          <span class="text-white/70 text-xs">
+            {{ thought.category.name }}
+          </span>
+        </div>
+        <div v-else class="flex-1"></div>
 
-    <!-- Category indicator -->
-    <div v-if="thought.category" class="mt-3 flex items-center">
-      <UIcon
-        v-if="thought.category.icon"
-        :name="thought.category.icon"
-        class="h-4 w-4 text-white/70 mr-1"
-      />
-      <span class="text-white/70 text-xs">
-        {{ thought.category.name }}
-      </span>
+        <!-- Date -->
+        <div class="text-white/70 text-xs">
+          {{ formatDate(thought.createdAt) }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -89,13 +103,7 @@ const _props = defineProps({
 });
 
 // Emits
-const _emit = defineEmits([
-  "click",
-  "toggle-favorite",
-  "edit",
-  "delete",
-  "archive",
-]);
+const _emit = defineEmits(["toggle-favorite", "edit", "delete", "archive"]);
 
 // Format date helper
 const formatDate = (date) => {
@@ -113,5 +121,14 @@ const formatDate = (date) => {
   } else {
     return d.toLocaleDateString();
   }
+};
+
+// Truncate title helper
+const truncateTitle = (title) => {
+  const maxLength = 50; // Maximum characters for title
+  if (title.length <= maxLength) {
+    return title;
+  }
+  return title.substring(0, maxLength).trim() + "...";
 };
 </script>

@@ -1,4 +1,4 @@
-import type { ColorOption, NavItem } from '@/types'
+import type { ColorOption } from '@/types'
 
 // Color options for thoughts and categories
 export const THOUGHT_COLORS: ColorOption[] = [
@@ -38,29 +38,8 @@ export const CATEGORY_ICONS = [
     'lucide:helping-hand'
 ]
 
-// Navigation items with Lucide icons
-export const NAV_ITEMS: NavItem[] = [
-    {
-        name: 'nav.dashboard',
-        href: '/',
-        icon: 'lucide:home'
-    },
-    {
-        name: 'nav.thoughts',
-        href: '/thoughts',
-        icon: 'lucide:lightbulb'
-    },
-    {
-        name: 'nav.categories',
-        href: '/categories',
-        icon: 'lucide:tag'
-    },
-    {
-        name: 'nav.settings',
-        href: '/settings',
-        icon: 'lucide:settings'
-    }
-]
+// Navigation items (currently unused since sidebar was removed)
+// export const NAV_ITEMS: NavItem[] = []
 
 // Theme options with Lucide icons
 export const THEME_OPTIONS = [
