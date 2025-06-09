@@ -176,32 +176,24 @@
 import { THOUGHT_COLORS } from "@/utils/constants";
 
 // Props
-interface Props {
-  initialData?: {
-    name?: string;
-    description?: string;
-    icon?: string;
-    color?: string;
-  };
-  loading?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-});
+const props = withDefaults(
+  defineProps({
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  }),
+  {
+    loading: false,
+  }
+);
 
 // Emits
-const emit = defineEmits<{
-  submit: [
-    data: {
-      name: string;
-      description?: string;
-      icon?: string;
-      color: string;
-    }
-  ];
-  cancel: [];
-}>();
+const emit = defineEmits(["submit", "cancel"]);
 
 // Form data
 const formData = ref({
@@ -213,7 +205,7 @@ const formData = ref({
 });
 
 // Form state
-const errors = ref<Record<string, string>>({});
+const errors = ref({});
 
 // Icon options - popular icons for categories
 const iconOptions = [
@@ -243,12 +235,12 @@ const iconOptions = [
 const colorOptions = THOUGHT_COLORS;
 
 // Methods
-const getIconLabel = (iconValue: string): string => {
+const getIconLabel = (iconValue) => {
   const option = iconOptions.find((opt) => opt.value === iconValue);
   return option?.label || "Unknown";
 };
 
-const validateForm = (): boolean => {
+const validateForm = () => {
   errors.value = {};
 
   if (!formData.value.name.trim()) {

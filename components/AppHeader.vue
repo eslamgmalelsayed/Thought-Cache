@@ -128,9 +128,9 @@
                 <UButton
                   variant="ghost"
                   color="red"
-                  class="w-full justify-start cursor-pointer"
                   icon="lucide:log-out"
                   @click="handleSignOut"
+                  class="w-full justify-start cursor-pointer"
                 >
                   {{ t("auth.signOut") || "Sign Out" }}
                 </UButton>

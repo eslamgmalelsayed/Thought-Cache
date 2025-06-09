@@ -158,27 +158,35 @@
 
 <script setup lang="ts">
 import { THOUGHT_COLORS } from "@/utils/constants";
-import type { ThoughtFormData } from "@/types";
 
 // Props
-interface Props {
-  initialData?: Partial<ThoughtFormData>;
-  loading?: boolean;
-  categoryOptions?: Array<{ id: string; name: string }>;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-  categoryOptions: () => [],
-});
+const props = withDefaults(
+  defineProps({
+    initialData: {
+      type: Object,
+      default: () => ({}),
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    categoryOptions: {
+      type: Array,
+      default: () => [],
+    },
+  }),
+  {
+    initialData: () => ({}),
+    loading: false,
+    categoryOptions: () => [],
+  }
+);
 
 // Emits
-const emit = defineEmits<{
-  submit: [data: ThoughtFormData];
-}>();
+const emit = defineEmits(["submit"]);
 
 // Form data
-const formData = ref<ThoughtFormData>({
+const formData = ref({
   title: "",
   content: "",
   color: THOUGHT_COLORS[0].value,
@@ -188,14 +196,14 @@ const formData = ref<ThoughtFormData>({
 });
 
 // Form state
-const errors = ref<Record<string, string>>({});
+const errors = ref({});
 const newTag = ref("");
 
 // Color options
 const colorOptions = THOUGHT_COLORS;
 
 // Methods
-const validateForm = (): boolean => {
+const validateForm = () => {
   errors.value = {};
 
   if (!formData.value.title.trim()) {
@@ -232,7 +240,7 @@ const handleTagKeyup = (event) => {
   }
 };
 
-const removeTag = (index: number) => {
+const removeTag = (index) => {
   formData.value.tags.splice(index, 1);
 };
 
