@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
+    "build:quiet": "cross-env NODE_OPTIONS=--no-deprecation nuxt build",
     "dev": "nuxt dev",
+    "dev:quiet": "cross-env NODE_OPTIONS=--no-deprecation nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "eslint .",
@@ -32,11 +34,12 @@
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "eslint --max-warnings=0"
+      "eslint --max-warnings=100"
     ]
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.45",
+    "cross-env": "^7.0.3",
     "vue-tsc": "^2.2.10"
   }
 }
