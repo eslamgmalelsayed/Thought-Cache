@@ -62,6 +62,7 @@ const props = defineProps({
   trend: {
     type: String,
     required: false,
+    default: "",
   },
 });
 

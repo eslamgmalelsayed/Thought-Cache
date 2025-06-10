@@ -39,7 +39,7 @@
                     class="w-full h-full object-cover"
                     @error="onImageError"
                     @load="onImageLoad"
-                  />
+                  >
                 </div>
                 <div
                   v-else
@@ -96,15 +96,15 @@
                   />
                 </div>
 
-                <hr class="my-2 border-gray-200 dark:border-gray-700" />
+                <hr class="my-2 border-gray-200 dark:border-gray-700" >
 
                 <!-- Sign Out -->
                 <UButton
                   variant="ghost"
                   color="red"
                   icon="lucide:log-out"
-                  @click="handleSignOut"
                   class="w-full justify-start cursor-pointer"
+                  @click="handleSignOut"
                 >
                   {{ t("auth.signOut") || "Sign Out" }}
                 </UButton>
@@ -126,7 +126,7 @@
           <div
             v-else
             class="h-8 w-8 rounded-full bg-gray-300 animate-pulse"
-          ></div>
+          />
         </div>
       </div>
     </div>

@@ -3,13 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "build:quiet": "cross-env NODE_OPTIONS=--no-deprecation nuxt build",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation nuxt build",
+    "build:verbose": "nuxt build",
     "dev": "nuxt dev",
     "dev:quiet": "cross-env NODE_OPTIONS=--no-deprecation nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "cross-env NODE_OPTIONS=--no-deprecation nuxt generate",
     "preview": "nuxt preview",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "eslint --max-warnings=100"
+      "eslint --quiet"
     ]
   },
   "devDependencies": {
