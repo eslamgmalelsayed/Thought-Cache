@@ -1,89 +1,5 @@
 <template>
   <div class="space-y-6">
-    <!-- Welcome header -->
-    <div
-      class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg p-6 text-white"
-    >
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold">
-            {{ $t("auth.welcome") }}
-          </h1>
-          <p class="mt-2 text-primary-100">
-            {{ $t("app.description") }}
-          </p>
-        </div>
-        <UModal>
-          <UButton
-            color="white"
-            variant="solid"
-            icon="lucide:plus"
-            :label="$t('thoughts.add') || 'Add Thought'"
-            class="hidden sm:flex cursor-pointer"
-          />
-
-          <template #content>
-            <UCard
-              :ui="{
-                ring: '',
-                divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-              }"
-            >
-              <template #header>
-                <div class="flex items-center justify-between">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    {{ $t("thoughts.add") || "Add New Thought" }}
-                  </h3>
-                </div>
-              </template>
-
-              <ThoughtForm
-                :loading="savingThought"
-                :category-options="categoryOptions"
-                @submit="handleAddThought"
-              />
-            </UCard>
-          </template>
-        </UModal>
-
-        <UModal>
-          <UButton
-            color="white"
-            variant="solid"
-            icon="lucide:plus"
-            class="sm:hidden cursor-pointer"
-          />
-
-          <template #content>
-            <UCard
-              :ui="{
-                ring: '',
-                divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-              }"
-            >
-              <template #header>
-                <div class="flex items-center justify-between">
-                  <h3
-                    class="text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    {{ $t("thoughts.add") || "Add New Thought" }}
-                  </h3>
-                </div>
-              </template>
-
-              <ThoughtForm
-                :loading="savingThought"
-                :category-options="categoryOptions"
-                @submit="handleAddThought"
-              />
-            </UCard>
-          </template>
-        </UModal>
-      </div>
-    </div>
-
     <!-- Statistics cards -->
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <template v-if="loadingStats">
@@ -98,16 +14,10 @@
           :trend="stats.thoughtsTrend"
         />
         <StatCard
-          :title="$t('categories.title')"
-          :value="stats.totalCategories"
-          icon="lucide:tag"
-          color="green"
-        />
-        <StatCard
           :title="'Favorites'"
           :value="stats.favoriteThoughts"
           icon="lucide:heart"
-          color="pink"
+          color="red"
         />
         <StatCard
           :title="'This Month'"
@@ -116,10 +26,16 @@
           color="purple"
           :trend="stats.monthlyTrend"
         />
+        <StatCard
+          :title="'Tags Used'"
+          :value="stats.totalTags"
+          icon="lucide:hash"
+          color="green"
+        />
       </template>
     </div>
 
-    <!-- Search and Filters -->
+    <!-- Search -->
     <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
       <div class="flex flex-col sm:flex-row gap-4">
         <div class="flex-1">
@@ -134,14 +50,15 @@
           />
         </div>
         <div class="flex gap-2">
-          <USelectMenu
-            v-model="selectedCategory"
-            :options="categoryOptions"
-            placeholder="All Categories"
-            value-attribute="id"
-            option-attribute="name"
-            icon="lucide:tag"
-          />
+          <UButton
+            :variant="showFavorites ? 'solid' : 'outline'"
+            color="red"
+            icon="lucide:heart"
+            class="cursor-pointer"
+            @click="showFavorites = !showFavorites"
+          >
+            {{ showFavorites ? "All" : "Favorites" }}
+          </UButton>
         </div>
       </div>
     </div>
@@ -173,37 +90,13 @@
             : "Start by adding your first brilliant idea!"
         }}
       </p>
-      <UModal>
-        <UButton
-          color="primary"
-          class="mt-4 cursor-pointer"
-          icon="lucide:plus"
-          :label="$t('thoughts.add') || 'Add Thought'"
-        />
-
-        <template #content>
-          <UCard
-            :ui="{
-              ring: '',
-              divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-            }"
-          >
-            <template #header>
-              <div class="flex items-center justify-between">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  {{ $t("thoughts.add") || "Add New Thought" }}
-                </h3>
-              </div>
-            </template>
-
-            <ThoughtForm
-              :loading="savingThought"
-              :category-options="categoryOptions"
-              @submit="handleAddThought"
-            />
-          </UCard>
-        </template>
-      </UModal>
+      <UButton
+        color="primary"
+        class="mt-4 cursor-pointer"
+        icon="lucide:plus"
+        :label="$t('thoughts.add') || 'Add Thought'"
+        @click="openAddModal"
+      />
     </div>
 
     <!-- Thoughts Grid -->
@@ -230,7 +123,6 @@
           @toggle-favorite="toggleFavorite"
           @edit="editThought"
           @delete="deleteThought"
-          @archive="archiveThought"
         />
       </div>
 
@@ -247,6 +139,16 @@
         />
       </div>
     </div>
+
+    <!-- Single Modal for Add/Edit -->
+    <ThoughtModal
+      :is-open-modal="showModal"
+      :is-edit="!!currentThought"
+      :thought-data="currentThought"
+      :loading="savingThought"
+      @close="closeModal"
+      @submit="handleThoughtSubmit"
+    />
   </div>
 </template>
 
@@ -257,6 +159,10 @@ definePageMeta({
   middleware: "auth",
 });
 
+// Auth
+const { user, isLoaded, isSignedIn } = useAuth();
+const { db } = useSupabase();
+
 // Data loading states
 const loadingStats = ref(true);
 const loadingThoughts = ref(true);
@@ -265,11 +171,13 @@ const searching = ref(false);
 const loadingMore = ref(false);
 const savingThought = ref(false);
 
+// Modal state
+const showModal = ref(false);
+const currentThought = ref(null);
+
 // Search and filter state
 const searchQuery = ref("");
-const selectedCategory = ref(null);
 const showFavorites = ref(false);
-const showArchived = ref(false);
 
 // Data
 const thoughts = ref([]);
@@ -278,20 +186,12 @@ const hasMoreThoughts = ref(true);
 
 const stats = ref({
   totalThoughts: 0,
-  totalCategories: 0,
   favoriteThoughts: 0,
   monthlyThoughts: 0,
+  totalTags: 0,
   thoughtsTrend: "+12%",
   monthlyTrend: "+8%",
 });
-
-// Options
-const categoryOptions = ref([
-  { id: null, name: "All Categories" },
-  { id: "1", name: "Personal" },
-  { id: "2", name: "Work" },
-  { id: "3", name: "Ideas" },
-]);
 
 // Computed
 const filteredThoughts = computed(() => {
@@ -302,22 +202,13 @@ const filteredThoughts = computed(() => {
     filtered = filtered.filter(
       (thought) =>
         thought.title.toLowerCase().includes(query) ||
-        thought.content.toLowerCase().includes(query)
-    );
-  }
-
-  if (selectedCategory.value) {
-    filtered = filtered.filter(
-      (thought) => thought.categoryId === selectedCategory.value
+        thought.content.toLowerCase().includes(query) ||
+        thought.tags.some((tag) => tag.toLowerCase().includes(query))
     );
   }
 
   if (showFavorites.value) {
     filtered = filtered.filter((thought) => thought.isFavorite);
-  }
-
-  if (!showArchived.value) {
-    filtered = filtered.filter((thought) => !thought.isArchived);
   }
 
   return filtered;
@@ -326,20 +217,34 @@ const filteredThoughts = computed(() => {
 // Load dashboard data
 const loadDashboardData = async () => {
   try {
-    // Fetch recent thoughts and stats with realistic loading simulation
-    const [thoughtsResponse, statsResponse] = await Promise.all([
-      $fetch("/api/thoughts?limit=20&sort=createdAt:desc"),
-      $fetch("/api/stats/dashboard"),
-    ]);
+    // Wait for auth to load
+    if (!isLoaded.value) {
+      console.log("Auth still loading, skipping data load");
+      return;
+    }
 
-    thoughts.value = thoughtsResponse.data || [];
-    recentThoughts.value = thoughtsResponse.data || [];
-    stats.value = {
-      ...stats.value,
-      ...statsResponse.data,
-      totalThoughts: thoughts.value.length,
-      favoriteThoughts: thoughts.value.filter((t) => t.isFavorite).length,
-    };
+    if (!isSignedIn.value || !user?.value?.id) {
+      console.log("User not authenticated, skipping data load");
+      return;
+    }
+
+    // Fetch user's thoughts from Supabase
+    console.log("Loading thoughts from Supabase for user:", user.value.id);
+    const { data: userThoughts, error } = await db.thoughts.getByUserId(
+      user.value.id
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    thoughts.value = userThoughts || [];
+    recentThoughts.value = userThoughts || [];
+
+    console.log("Loaded thoughts:", thoughts.value.length);
+
+    // Update stats with actual data
+    updateStats();
 
     // Simulate staggered loading for better UX
     setTimeout(() => {
@@ -389,11 +294,28 @@ const toggleFavorite = (thought) => {
 };
 
 /**
- * Navigate to edit a specific thought
+ * Open modal for editing a thought
  * @param {Object} thought - The thought object
  */
 const editThought = (thought) => {
-  navigateTo(`/thoughts/${thought.id}/edit`);
+  currentThought.value = thought;
+  showModal.value = true;
+};
+
+/**
+ * Open modal for adding a new thought
+ */
+const openAddModal = () => {
+  currentThought.value = null;
+  showModal.value = true;
+};
+
+/**
+ * Close modal and reset state
+ */
+const closeModal = () => {
+  showModal.value = false;
+  currentThought.value = null;
 };
 
 /**
@@ -406,72 +328,102 @@ const deleteThought = (thought) => {
 };
 
 /**
- * Toggle the archive status of a thought
- * @param {Object} thought - The thought object
+ * Handle both adding and editing thoughts
+ * @param {Object} data - The thought form data
  */
-const archiveThought = (thought) => {
-  // Archive logic
-  const index = thoughts.value.findIndex((t) => t.id === thought.id);
-  if (index !== -1) {
-    thoughts.value[index].isArchived = !thoughts.value[index].isArchived;
+const handleThoughtSubmit = async (data) => {
+  const isEdit = !!currentThought.value;
+  console.log(`${isEdit ? "Edit" : "Add"} thought called with:`, data);
+
+  try {
+    savingThought.value = true;
+
+    // Wait for auth to load and check if user is signed in
+    if (!isLoaded.value) {
+      throw new Error("Authentication still loading, please wait");
+    }
+
+    if (!isSignedIn.value || !user?.value?.id) {
+      throw new Error("User not authenticated");
+    }
+
+    console.log("User authenticated:", user.value.id);
+
+    if (isEdit) {
+      // Update existing thought in Supabase
+      console.log("Updating thought in Supabase:", data);
+      const { data: updatedThought, error } = await db.thoughts.update(
+        currentThought.value.id,
+        {
+          title: data.title,
+          content: data.content,
+          color: data.color,
+          tags: data.tags,
+          updated_at: new Date().toISOString(),
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state
+      const index = thoughts.value.findIndex(
+        (t) => t.id === currentThought.value.id
+      );
+      if (index !== -1) {
+        thoughts.value[index] = updatedThought;
+      }
+      console.log("Thought updated successfully!");
+    } else {
+      // Create new thought in Supabase
+      console.log("Creating thought in Supabase:", data);
+      const { data: newThought, error } = await db.thoughts.create({
+        title: data.title,
+        content: data.content,
+        color: data.color,
+        tags: data.tags,
+        user_id: user.value.id,
+        is_favorite: false,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log("New thought created in Supabase:", newThought);
+      thoughts.value.unshift(newThought);
+      console.log("Thought created successfully!");
+    }
+
+    // Update stats
+    updateStats();
+
+    // Close modal
+    closeModal();
+  } catch (error) {
+    console.error(`Failed to ${isEdit ? "update" : "create"} thought:`, error);
+    // TODO: Show user-friendly error message (toast notification)
+    alert(
+      `Failed to ${isEdit ? "update" : "create"} thought: ${error.message}`
+    );
+  } finally {
+    savingThought.value = false;
   }
 };
 
 /**
- * Handle adding a new thought
- * @param {Object} data - The thought form data
+ * Update statistics
  */
-const handleAddThought = async (data) => {
-  try {
-    savingThought.value = true;
+const updateStats = () => {
+  const allTags = thoughts.value.flatMap((t) => t.tags);
+  const uniqueTags = [...new Set(allTags)];
 
-    // Simulate API call to create thought
-    console.log("Creating thought:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Create new thought object
-    const newThought = {
-      id: Date.now().toString(),
-      title: data.title,
-      content: data.content,
-      color: data.color,
-      isArchived: false,
-      isFavorite: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: "user_1",
-      categoryId: data.categoryId || null,
-      category: data.categoryId
-        ? categoryOptions.value.find((c) => c.id === data.categoryId)
-        : null,
-      tags: data.tags.map((tagName, index) => ({
-        thoughtId: Date.now().toString(),
-        tagId: `tag_${Date.now()}_${index}`,
-        tag: {
-          id: `tag_${Date.now()}_${index}`,
-          name: tagName,
-          createdAt: new Date(),
-        },
-      })),
-    };
-
-    // Add to thoughts array
-    thoughts.value.unshift(newThought);
-
-    // Update stats
-    stats.value.totalThoughts = thoughts.value.length;
-    stats.value.favoriteThoughts = thoughts.value.filter(
-      (t) => t.isFavorite
-    ).length;
-
-    // Show success message (you could use a toast notification here)
-    console.log("Thought created successfully!");
-  } catch (error) {
-    console.error("Failed to create thought:", error);
-    // Handle error (show error message)
-  } finally {
-    savingThought.value = false;
-  }
+  stats.value.totalThoughts = thoughts.value.length;
+  stats.value.favoriteThoughts = thoughts.value.filter(
+    (t) => t.isFavorite
+  ).length;
+  stats.value.totalTags = uniqueTags.length;
 };
 
 // Watchers
@@ -493,4 +445,16 @@ onMounted(() => {
 
   loadDashboardData();
 });
+
+// Watch for user authentication changes and reload data
+watch(
+  [isLoaded, isSignedIn, user],
+  ([loaded, signedIn, currentUser]) => {
+    if (loaded && signedIn && currentUser?.id) {
+      console.log("User authenticated, loading dashboard data");
+      loadDashboardData();
+    }
+  },
+  { immediate: true }
+);
 </script>

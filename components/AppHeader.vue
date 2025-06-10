@@ -19,27 +19,8 @@
 
         <!-- Right section -->
         <div class="flex items-center space-x-4">
-          <!-- Quick actions -->
-          <UButton
-            icon="lucide:plus"
-            color="primary"
-            variant="solid"
-            :label="$t('thoughts.add')"
-            class="hidden sm:flex"
-            @click="emit('add-thought')"
-          />
-
-          <!-- Mobile add button -->
-          <UButton
-            icon="lucide:plus"
-            color="primary"
-            variant="solid"
-            class="sm:hidden"
-            @click="emit('add-thought')"
-          />
-
           <!-- User Avatar & Preferences -->
-          <div v-if="isLoaded" class="relative">
+          <div v-if="isLoaded && isSignedIn" class="relative">
             <!-- Avatar Button -->
             <UButton
               variant="ghost"
@@ -77,27 +58,23 @@
               class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
             >
               <div class="p-3">
-                <!-- Theme Toggle -->
+                <!-- Dark Mode Toggle -->
                 <div class="flex items-center justify-between py-2">
                   <div class="flex items-center">
                     <UIcon
-                      :name="themeIcon"
+                      name="lucide:moon"
                       class="h-4 w-4 text-gray-500 mr-2"
                     />
                     <span class="text-sm text-gray-700 dark:text-gray-300">
-                      {{ t("ui.theme.system") || "Theme" }}
+                      Dark Mode
                     </span>
                   </div>
-                  <UButton
-                    variant="outline"
-                    color="gray"
-                    size="xs"
-                    :icon="themeIcon"
-                    @click="toggleTheme"
-                    class="capitalize cursor-pointer"
-                  >
-                    {{ colorMode.preference }}
-                  </UButton>
+                  <USwitch
+                    unchecked-icon="i-lucide-sun"
+                    checked-icon="i-lucide-moon"
+                    :model-value="colorMode.value === 'dark'"
+                    @update:model-value="toggleDarkMode"
+                  />
                 </div>
 
                 <!-- Language Toggle -->
@@ -108,18 +85,15 @@
                       class="h-4 w-4 text-gray-500 mr-2"
                     />
                     <span class="text-sm text-gray-700 dark:text-gray-300">
-                      {{ t("nav.language") || "Language" }}
+                      English
                     </span>
                   </div>
-                  <UButton
-                    variant="outline"
-                    color="gray"
-                    size="xs"
-                    @click="toggleLanguage"
-                    class="min-w-[60px] cursor-pointer"
-                  >
-                    {{ currentLanguage?.label || "EN" }}
-                  </UButton>
+                  <USwitch
+                    unchecked-icon="i-lucide-x"
+                    checked-icon="i-lucide-check"
+                    :model-value="locale === 'en'"
+                    @update:model-value="toggleLanguage"
+                  />
                 </div>
 
                 <hr class="my-2 border-gray-200 dark:border-gray-700" />
@@ -137,6 +111,17 @@
               </div>
             </div>
           </div>
+          <!-- Sign In Button for unauthenticated users -->
+          <div v-else-if="isLoaded && !isSignedIn">
+            <UButton
+              color="primary"
+              variant="solid"
+              @click="navigateTo('/sign-in')"
+            >
+              Sign In
+            </UButton>
+          </div>
+
           <!-- Loading state -->
           <div
             v-else
@@ -149,10 +134,8 @@
 </template>
 
 <script setup lang="ts">
-import { LANGUAGE_OPTIONS } from "@/utils/constants";
-
-// User authentication
-const { user, signOut, isLoaded } = useAuth();
+// User authentication (auto-imported from @clerk/nuxt)
+const { user, isLoaded, isSignedIn } = useAuth();
 
 // User menu state
 const showUserMenu = ref(false);
@@ -272,46 +255,29 @@ const userInitials = computed(() => {
 
 // Theme management
 const colorMode = useColorMode();
-const themeIcon = computed(() => {
-  switch (colorMode.value) {
-    case "light":
-      return "lucide:sun";
-    case "dark":
-      return "lucide:moon";
-    default:
-      return "lucide:monitor";
-  }
-});
 
-const toggleTheme = () => {
-  const themes = ["light", "dark", "system"];
-  const currentIndex = themes.indexOf(colorMode.preference);
-  const nextIndex = (currentIndex + 1) % themes.length;
-  colorMode.preference = themes[nextIndex];
+const toggleDarkMode = (isDark) => {
+  colorMode.preference = isDark ? "dark" : "light";
 };
 
 // Language management
 const { locale, setLocale, t } = useI18n();
 
-const currentLanguage = computed(() => {
-  return (
-    LANGUAGE_OPTIONS.find((lang) => lang.value === locale.value) ||
-    LANGUAGE_OPTIONS[0]
-  );
-});
-
-const toggleLanguage = () => {
-  const newLocale = locale.value === "en" ? "ar" : "en";
+const toggleLanguage = (isEnglish) => {
+  const newLocale = isEnglish ? "en" : "ar";
   setLocale(newLocale);
 };
 
 // Sign out handler
 const handleSignOut = async () => {
   try {
-    await signOut();
+    if (import.meta.client && window.Clerk) {
+      await window.Clerk.signOut();
+    }
     await navigateTo("/sign-in");
   } catch (error) {
     console.error("Sign out error:", error);
+    await navigateTo("/sign-in");
   }
 };
 </script>

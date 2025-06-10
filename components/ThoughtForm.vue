@@ -13,15 +13,15 @@
         id="thought-title"
         v-model="formData.title"
         :placeholder="$t('thoughts.form.title') || 'Enter thought title...'"
-        :error="!!errors.title"
+        :error="!!(errors.title && errors.title.length)"
         autocomplete="off"
         required
       />
       <p
-        v-if="errors.title"
+        v-if="errors.title && errors.title.length"
         class="mt-1 text-sm text-red-600 dark:text-red-400"
       >
-        {{ errors.title }}
+        {{ errors.title[0] }}
       </p>
     </div>
 
@@ -39,62 +39,40 @@
         v-model="formData.content"
         :placeholder="$t('thoughts.form.content') || 'Write your thought...'"
         :rows="5"
-        :error="!!errors.content"
+        :error="!!(errors.content && errors.content.length)"
         autocomplete="off"
         required
       />
       <p
-        v-if="errors.content"
+        v-if="errors.content && errors.content.length"
         class="mt-1 text-sm text-red-600 dark:text-red-400"
       >
-        {{ errors.content }}
+        {{ errors.content[0] }}
       </p>
     </div>
 
-    <!-- Category and Color Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Category -->
-      <div>
-        <label
-          for="thought-category"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-        >
-          {{ $t("thoughts.form.category") || "Category" }}
-        </label>
-        <USelectMenu
-          v-model="formData.categoryId"
-          :options="categoryOptions"
-          placeholder="Select a category"
-          value-attribute="id"
-          option-attribute="name"
-          icon="lucide:tag"
-          autocomplete="off"
+    <!-- Color Row -->
+    <div>
+      <label
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        {{ $t("thoughts.form.color") || "Color" }}
+      </label>
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="color in colorOptions"
+          :key="color.value"
+          type="button"
+          :class="[
+            'w-8 h-8 rounded-full border-2 transition-all cursor-pointer',
+            formData.color === color.value
+              ? 'border-gray-400 ring-2 ring-gray-300'
+              : 'border-gray-200 hover:border-gray-300',
+          ]"
+          :style="{ backgroundColor: color.value }"
+          :title="color.name"
+          @click="formData.color = color.value"
         />
-      </div>
-
-      <!-- Color -->
-      <div>
-        <label
-          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-        >
-          {{ $t("thoughts.form.color") || "Color" }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="color in colorOptions"
-            :key="color.value"
-            type="button"
-            :class="[
-              'w-8 h-8 rounded-full border-2 transition-all cursor-pointer',
-              formData.color === color.value
-                ? 'border-gray-400 ring-2 ring-gray-300'
-                : 'border-gray-200 hover:border-gray-300',
-            ]"
-            :style="{ backgroundColor: color.value }"
-            :title="color.name"
-            @click="formData.color = color.value"
-          />
-        </div>
       </div>
     </div>
 
@@ -130,12 +108,22 @@
           v-model="newTag"
           :placeholder="$t('tags.placeholder') || 'Enter tag name...'"
           icon="lucide:hash"
+          :error="!!tagError"
           autocomplete="off"
           @keyup.enter="addTag"
           @keyup="handleTagKeyup"
         />
-        <p class="text-xs text-gray-500 dark:text-gray-400">
-          Press Enter or comma to add tags
+        <p v-if="tagError" class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ tagError }}
+        </p>
+        <p
+          v-else-if="errors.tags && errors.tags.length"
+          class="mt-1 text-sm text-red-600 dark:text-red-400"
+        >
+          {{ errors.tags[0] }}
+        </p>
+        <p v-else class="text-xs text-gray-500 dark:text-gray-400">
+          Press Enter or comma to add tags (max 10)
         </p>
       </div>
     </div>
@@ -144,53 +132,51 @@
     <div
       class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700"
     >
-      <UButton
-        type="submit"
-        color="primary"
-        :loading="loading"
-        :label="$t('thoughts.form.save') || 'Save Thought'"
-        icon="lucide:save"
-        class="cursor-pointer"
-      />
+      <div class="flex gap-2 justify-end">
+        <UButton
+          class="cursor-pointer"
+          color="neutral"
+          variant="ghost"
+          label="Cancel"
+          @click="handleClose"
+        />
+        <UButton
+          color="primary"
+          :label="$t('thoughts.form.save') || 'Save Thought'"
+          icon="lucide:save"
+          class="cursor-pointer"
+          :loading="loading"
+          @click="handleSubmit"
+        />
+      </div>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
 import { THOUGHT_COLORS } from "@/utils/constants";
+import { thoughtSchema, validateData, validateTag } from "@/utils/validation";
 
 // Props
-const props = withDefaults(
-  defineProps({
-    initialData: {
-      type: Object,
-      default: () => ({}),
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    categoryOptions: {
-      type: Array,
-      default: () => [],
-    },
-  }),
-  {
-    initialData: () => ({}),
-    loading: false,
-    categoryOptions: () => [],
-  }
-);
+const props = defineProps({
+  initialData: {
+    type: Object,
+    default: () => ({}),
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 // Emits
-const emit = defineEmits(["submit"]);
+const emit = defineEmits(["submit", "close"]);
 
 // Form data
 const formData = ref({
   title: "",
   content: "",
   color: THOUGHT_COLORS[0].value,
-  categoryId: "",
   tags: [],
   ...props.initialData,
 });
@@ -198,38 +184,61 @@ const formData = ref({
 // Form state
 const errors = ref({});
 const newTag = ref("");
+const tagError = ref("");
 
 // Color options
 const colorOptions = THOUGHT_COLORS;
 
 // Methods
 const validateForm = () => {
-  errors.value = {};
+  const validation = validateData(thoughtSchema, formData.value);
 
-  if (!formData.value.title.trim()) {
-    errors.value.title = "Title is required";
-  } else if (formData.value.title.length > 200) {
-    errors.value.title = "Title cannot exceed 200 characters";
+  if (validation.success) {
+    errors.value = {};
+    return true;
+  } else {
+    errors.value = validation.errors || {};
+    return false;
   }
-
-  if (!formData.value.content.trim()) {
-    errors.value.content = "Content is required";
-  } else if (formData.value.content.length > 5000) {
-    errors.value.content = "Content cannot exceed 5000 characters";
-  }
-
-  return Object.keys(errors.value).length === 0;
 };
 
 const addTag = () => {
   const tag = newTag.value.trim().replace(",", "");
-  if (
-    tag &&
-    !formData.value.tags.includes(tag) &&
-    formData.value.tags.length < 10
-  ) {
-    formData.value.tags.push(tag);
-    newTag.value = "";
+
+  if (!tag) {
+    tagError.value = "";
+    return;
+  }
+
+  // Validate individual tag
+  const tagValidation = validateTag(tag);
+  if (!tagValidation.valid) {
+    tagError.value = tagValidation.error || "Invalid tag";
+    return;
+  }
+
+  // Check if tag already exists
+  if (formData.value.tags.includes(tag)) {
+    tagError.value = "Tag already exists";
+    return;
+  }
+
+  // Check tag limit
+  if (formData.value.tags.length >= 10) {
+    tagError.value = "Maximum 10 tags allowed";
+    return;
+  }
+
+  // Add tag
+  formData.value.tags.push(tag);
+  newTag.value = "";
+  tagError.value = "";
+
+  // Clear any previous tags validation error
+  if (errors.value.tags) {
+    const newErrors = { ...errors.value };
+    delete newErrors.tags;
+    errors.value = newErrors;
   }
 };
 
@@ -238,15 +247,44 @@ const handleTagKeyup = (event) => {
     event.preventDefault();
     addTag();
   }
+
+  // Clear tag error when user starts typing
+  if (tagError.value && newTag.value.trim()) {
+    tagError.value = "";
+  }
 };
 
 const removeTag = (index) => {
   formData.value.tags.splice(index, 1);
+
+  // Clear tags validation error if it exists
+  if (errors.value.tags) {
+    const newErrors = { ...errors.value };
+    delete newErrors.tags;
+    errors.value = newErrors;
+  }
+};
+
+const handleClose = () => {
+  emit("close", false);
 };
 
 const handleSubmit = () => {
-  if (validateForm()) {
+  const isValid = validateForm();
+
+  if (isValid) {
     emit("submit", { ...formData.value });
+  } else {
+    console.log("Form validation failed, not submitting");
+  }
+};
+
+// Real-time validation
+const clearFieldError = (field) => {
+  if (errors.value[field]) {
+    const newErrors = { ...errors.value };
+    newErrors[field] = undefined;
+    errors.value = newErrors;
   }
 };
 
@@ -256,8 +294,24 @@ watch(
   (newData) => {
     if (newData) {
       Object.assign(formData.value, newData);
+      // Clear errors when data changes
+      errors.value = {};
     }
   },
   { deep: true }
+);
+
+// Clear errors when user types
+watch(
+  () => formData.value.title,
+  () => clearFieldError("title")
+);
+watch(
+  () => formData.value.content,
+  () => clearFieldError("content")
+);
+watch(
+  () => formData.value.color,
+  () => clearFieldError("color")
 );
 </script>

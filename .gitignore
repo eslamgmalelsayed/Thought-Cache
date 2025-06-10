@@ -23,4 +23,3 @@ logs
 .env.*
 !.env.example
 
-/generated/prisma

@@ -7,7 +7,7 @@
         </div>
       </div>
 
-      <div class="ml-5 w-0 flex-1">
+      <div class="mx-5 w-0 flex-1">
         <dl>
           <dt
             class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate"
@@ -42,13 +42,28 @@
 
 <script setup lang="ts">
 // Props
-const props = defineProps<{
-  title: string;
-  value: number | string;
-  icon: string;
-  color: "blue" | "green" | "purple" | "pink" | "yellow" | "red" | "indigo";
-  trend?: string;
-}>();
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  value: {
+    type: [Number, String],
+    required: true,
+  },
+  icon: {
+    type: String,
+    required: true,
+  },
+  color: {
+    type: String,
+    required: true,
+  },
+  trend: {
+    type: String,
+    required: false,
+  },
+});
 
 // Computed properties
 const iconClasses = computed(() => {

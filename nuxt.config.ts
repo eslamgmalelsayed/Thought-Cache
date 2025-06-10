@@ -82,7 +82,7 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ['@prisma/client', '@clerk/nuxt']
+    transpile: ['@clerk/nuxt']
   },
 
   // Vite configuration
@@ -91,17 +91,4 @@ export default defineNuxtConfig({
       sourcemap: process.env.NODE_ENV !== 'production'
     }
   },
-
-  // Nitro configuration for Prisma
-  nitro: {
-    preset: 'netlify',
-    experimental: {
-      wasm: true
-    },
-    esbuild: {
-      options: {
-        target: 'es2020'
-      }
-    }
-  }
 })

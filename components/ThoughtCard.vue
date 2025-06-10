@@ -16,26 +16,22 @@
 
       <!-- Action buttons -->
       <div class="flex items-center space-x-1 ml-2 flex-shrink-0">
-        <UButton
-          :icon="thought.isFavorite ? 'lucide:heart' : 'lucide:heart'"
+        <button
           :class="{
-            'text-red-300': thought.isFavorite,
-            'text-white/70': !thought.isFavorite,
+            'text-red-500 hover:text-red-600': thought.isFavorite,
+            'text-white/70 hover:text-white': !thought.isFavorite,
           }"
-          variant="ghost"
-          color="white"
-          size="xs"
-          class="cursor-pointer"
+          class="p-1 rounded transition-colors cursor-pointer"
           @click.stop="$emit('toggle-favorite', thought)"
-        />
-        <UButton
-          icon="lucide:more-horizontal"
-          variant="ghost"
-          color="white"
-          size="xs"
-          class="cursor-pointer"
-          @click.stop
-        />
+        >
+          <UIcon
+            :name="thought.isFavorite ? 'lucide:heart' : 'lucide:heart'"
+            :class="{
+              'fill-current': thought.isFavorite,
+            }"
+            class="h-4 w-4"
+          />
+        </button>
       </div>
     </div>
 
@@ -52,10 +48,10 @@
       <div class="flex flex-wrap gap-1">
         <span
           v-for="tag in thought.tags.slice(0, 2)"
-          :key="tag.tagId"
+          :key="tag"
           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/20 text-white"
         >
-          #{{ tag.tag.name }}
+          #{{ tag }}
         </span>
         <span
           v-if="thought.tags.length > 2"
@@ -65,25 +61,19 @@
         </span>
       </div>
 
-      <!-- Bottom row with category and date -->
-      <div class="flex items-center justify-between">
-        <!-- Category indicator -->
-        <div v-if="thought.category" class="flex items-center">
-          <UIcon
-            v-if="thought.category.icon"
-            :name="thought.category.icon"
-            class="h-4 w-4 text-white/70 mr-1"
-          />
-          <span class="text-white/70 text-xs">
-            {{ thought.category.name }}
-          </span>
-        </div>
-        <div v-else class="flex-1"></div>
-
-        <!-- Date -->
+      <!-- Bottom row with date and edit button -->
+      <div class="flex items-center justify-between w-full space-x-2">
         <div class="text-white/70 text-xs">
           {{ formatDate(thought.createdAt) }}
         </div>
+        <UButton
+          color="neutral"
+          size="xs"
+          :label="$t('thoughts.edit') || 'Edit'"
+          icon="lucide:edit"
+          class="cursor-pointer"
+          @click.stop="$emit('edit', thought)"
+        />
       </div>
     </div>
   </div>
