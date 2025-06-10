@@ -4,7 +4,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: true,
   nitro: {
-    preset: 'netlify'
+    preset: 'netlify',
+    output: {
+      publicDir: '.output/public'
+    }
   },
 
   modules: [

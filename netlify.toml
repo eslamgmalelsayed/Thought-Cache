@@ -3,25 +3,4 @@
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION = "20"
-  NPM_FLAGS = "--production=false"
-
-[functions]
-  node_bundler = "esbuild"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-
-[[redirects]]
-  from = "/_nuxt/*"
-  to = "/_nuxt/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200 
+  NODE_VERSION = "20" 
