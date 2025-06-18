@@ -1,7 +1,7 @@
 import { _ as _sfc_main$c } from './Skeleton-Bh-iScxY.mjs';
 import { defineComponent, ref, computed, watch, mergeProps, unref, isRef, withCtx, createTextVNode, toDisplayString, mergeModels, useSlots, useModel, createVNode, renderSlot, createBlock, createCommentVNode, openBlock, toRef, toHandlers, nextTick, useSSRContext } from 'vue';
 import { ssrRenderAttrs, ssrRenderList, ssrRenderComponent, ssrInterpolate, ssrRenderClass, ssrRenderSlot, ssrRenderAttr, ssrRenderStyle } from 'vue/server-renderer';
-import { g as _sfc_main$7$1, a as _sfc_main$b, j as useRuntimeConfig, b as useAppConfig, c as useFormField, d as useButtonGroup, e as useComponentIcons, t as tv, f as _sfc_main$a$1, h as useLocale, r as reactivePick, i as usePortal, l as looseToNumber } from './server.mjs';
+import { k as useI18n, g as _sfc_main$7$1, a as _sfc_main$b, j as useRuntimeConfig, b as useAppConfig, c as useFormField, d as useButtonGroup, e as useComponentIcons, t as tv, f as _sfc_main$a$1, h as useLocale, r as reactivePick, i as usePortal, l as looseToNumber } from './server.mjs';
 import { Primitive, useForwardPropsEmits, DialogRoot, DialogTrigger, DialogPortal, DialogOverlay, DialogContent, VisuallyHidden, DialogTitle, DialogDescription, DialogClose } from 'reka-ui';
 import { z } from 'zod';
 import { useAuth } from '@clerk/vue';
@@ -722,16 +722,25 @@ const _sfc_main$6 = /* @__PURE__ */ defineComponent({
       } else {
         _push(`<!---->`);
       }
-      _push(`</div><div class="flex items-center justify-between w-full space-x-2"><div class="text-white/70 text-xs">${ssrInterpolate(formatDate(__props.thought.createdAt))}</div>`);
+      _push(`</div><div class="flex items-center justify-between w-full space-x-2"><div class="text-white/70 text-xs">${ssrInterpolate(formatDate(__props.thought.createdAt))}</div><div class="flex items-center space-x-1">`);
       _push(ssrRenderComponent(_component_UButton, {
         color: "neutral",
         size: "xs",
-        label: _ctx.$t("thoughts.edit") || "Edit",
+        label: _ctx.$t("ui.edit") || "Edit",
         icon: "lucide:edit",
         class: "cursor-pointer",
         onClick: ($event) => _ctx.$emit("edit", __props.thought)
       }, null, _parent));
-      _push(`</div></div></div>`);
+      _push(ssrRenderComponent(_component_UButton, {
+        color: "red",
+        variant: "soft",
+        size: "xs",
+        label: _ctx.$t("ui.delete") || "Delete",
+        icon: "lucide:trash-2",
+        class: "cursor-pointer",
+        onClick: ($event) => _ctx.$emit("delete", __props.thought)
+      }, null, _parent));
+      _push(`</div></div></div></div>`);
     };
   }
 });
@@ -2464,8 +2473,6 @@ const _sfc_main$2 = /* @__PURE__ */ defineComponent({
       const isValid = validateForm();
       if (isValid) {
         emit("submit", { ...formData.value });
-      } else {
-        console.log("Form validation failed, not submitting");
       }
     };
     const clearFieldError = (field) => {
@@ -2648,7 +2655,6 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       set: (value) => emit("update:modelValue", value)
     });
     const handleSubmit = (data) => {
-      console.log("ThoughtModal: Form submitted with data:", data);
       emit("submit", data);
     };
     const handleClose = () => {
@@ -2725,7 +2731,81 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
   __ssrInlineRender: true,
   setup(__props) {
     const { user, isLoaded, isSignedIn } = useAuth();
-    const { db } = useSupabase();
+    const { t } = useI18n();
+    const clerkUser = ref(null);
+    const clerkLoaded = ref(false);
+    const clerkSignedIn = ref(false);
+    const userId = computed(() => {
+      var _a, _b, _c, _d;
+      const authUserId = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.id) || ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.userId);
+      if (authUserId) return authUserId;
+      const clerkUserId = ((_c = clerkUser.value) == null ? void 0 : _c.id) || ((_d = clerkUser.value) == null ? void 0 : _d.userId);
+      if (clerkUserId) return clerkUserId;
+      return null;
+    });
+    computed(() => {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+      const authEmail = ((_c = (_b = (_a = user == null ? void 0 : user.value) == null ? void 0 : _a.emailAddresses) == null ? void 0 : _b[0]) == null ? void 0 : _c.emailAddress) || ((_e = (_d = user == null ? void 0 : user.value) == null ? void 0 : _d.primaryEmailAddress) == null ? void 0 : _e.emailAddress) || ((_f = user == null ? void 0 : user.value) == null ? void 0 : _f.email);
+      if (authEmail) return authEmail;
+      const clerkEmail = ((_h = (_g = clerkUser.value) == null ? void 0 : _g.primaryEmailAddress) == null ? void 0 : _h.emailAddress) || ((_k = (_j = (_i = clerkUser.value) == null ? void 0 : _i.emailAddresses) == null ? void 0 : _j[0]) == null ? void 0 : _k.emailAddress) || ((_l = clerkUser.value) == null ? void 0 : _l.email);
+      if (clerkEmail) return clerkEmail;
+      return null;
+    });
+    const userDisplayName = computed(() => {
+      var _a, _b, _c, _d, _e, _f;
+      const authName = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.fullName) || ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.firstName) || ((_c = user == null ? void 0 : user.value) == null ? void 0 : _c.name);
+      if (authName) return authName;
+      const clerkName = ((_d = clerkUser.value) == null ? void 0 : _d.fullName) || ((_e = clerkUser.value) == null ? void 0 : _e.firstName) || ((_f = clerkUser.value) == null ? void 0 : _f.name);
+      if (clerkName) return clerkName;
+      return "User";
+    });
+    computed(() => {
+      var _a, _b, _c, _d, _e, _f;
+      const authAvatar = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.imageUrl) || ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.profileImageUrl) || ((_c = user == null ? void 0 : user.value) == null ? void 0 : _c.avatar);
+      if (authAvatar) return authAvatar;
+      const clerkAvatar = ((_d = clerkUser.value) == null ? void 0 : _d.imageUrl) || ((_e = clerkUser.value) == null ? void 0 : _e.profileImageUrl) || ((_f = clerkUser.value) == null ? void 0 : _f.avatar);
+      if (clerkAvatar) return clerkAvatar;
+      return null;
+    });
+    computed(() => {
+      var _a, _b, _c, _d;
+      let firstName = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.firstName) || "";
+      let lastName = ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.lastName) || "";
+      if (!firstName && !lastName) {
+        firstName = ((_c = clerkUser.value) == null ? void 0 : _c.firstName) || "";
+        lastName = ((_d = clerkUser.value) == null ? void 0 : _d.lastName) || "";
+      }
+      if (firstName && lastName) {
+        return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+      } else if (firstName) {
+        return firstName.charAt(0).toUpperCase();
+      } else if (userDisplayName.value && userDisplayName.value !== "User") {
+        const names = userDisplayName.value.split(" ");
+        if (names.length >= 2) {
+          return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+        }
+        return names[0].charAt(0).toUpperCase();
+      }
+      return "U";
+    });
+    computed(() => {
+      var _a, _b;
+      let createdAt = (_a = user == null ? void 0 : user.value) == null ? void 0 : _a.createdAt;
+      if (!createdAt) {
+        createdAt = (_b = clerkUser.value) == null ? void 0 : _b.createdAt;
+      }
+      if (createdAt) {
+        const date = new Date(createdAt);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short"
+        });
+      }
+      return "Recently";
+    });
+    const isAuthLoaded = computed(() => isLoaded.value || clerkLoaded.value);
+    const isUserSignedIn = computed(() => isSignedIn.value || clerkSignedIn.value);
+    useSupabase();
     const loadingStats = ref(true);
     const loadingThoughts = ref(true);
     const loadingActions = ref(true);
@@ -2761,56 +2841,91 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       return filtered;
     });
     const loadDashboardData = async () => {
-      var _a;
       try {
-        if (!isLoaded.value) {
-          console.log("Auth still loading, skipping data load");
+        let authCheckAttempts = 0;
+        const maxAuthAttempts = 50;
+        while (!isAuthLoaded.value && authCheckAttempts < maxAuthAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          authCheckAttempts++;
+        }
+        if (!isAuthLoaded.value) {
+          finishLoading();
           return;
         }
-        if (!isSignedIn.value || !((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.id)) {
-          console.log("User not authenticated, skipping data load");
+        if (!isUserSignedIn.value || !userId.value) {
+          finishLoading();
           return;
         }
-        console.log("Loading thoughts from Supabase for user:", user.value.id);
-        const { data: userThoughts, error } = await db.thoughts.getByUserId(
-          user.value.id
-        );
-        if (error) {
-          throw error;
+        const response = await $fetch("/api/thoughts");
+        if (response.success) {
+          const userThoughts = response.data.filter((thought) => thought.user_id === userId.value).map((thought) => ({
+            ...thought,
+            isFavorite: thought.is_favorite
+            // Transform snake_case to camelCase
+          }));
+          thoughts.value = userThoughts || [];
+          recentThoughts.value = userThoughts || [];
+        } else {
+          thoughts.value = [];
+          recentThoughts.value = [];
         }
-        thoughts.value = userThoughts || [];
-        recentThoughts.value = userThoughts || [];
-        console.log("Loaded thoughts:", thoughts.value.length);
         updateStats();
-        setTimeout(() => {
-          loadingStats.value = false;
-        }, 800);
-        setTimeout(() => {
-          loadingActions.value = false;
-        }, 1e3);
-        setTimeout(() => {
-          loadingThoughts.value = false;
-        }, 1200);
+        finishLoading();
       } catch (error) {
-        console.error("Failed to load dashboard data:", error);
-        loadingStats.value = false;
-        loadingActions.value = false;
-        loadingThoughts.value = false;
+        thoughts.value = [];
+        recentThoughts.value = [];
+        finishLoading();
       }
     };
-    const loadMore = async () => {
-      loadingMore.value = true;
-      await new Promise((resolve) => setTimeout(resolve, 1e3));
-      hasMoreThoughts.value = false;
-      loadingMore.value = false;
+    const finishLoading = () => {
+      setTimeout(() => {
+        loadingStats.value = false;
+      }, 300);
+      setTimeout(() => {
+        loadingActions.value = false;
+      }, 500);
+      setTimeout(() => {
+        loadingThoughts.value = false;
+      }, 700);
     };
-    const toggleFavorite = (thought) => {
-      const index = thoughts.value.findIndex((t) => t.id === thought.id);
-      if (index !== -1) {
-        thoughts.value[index].isFavorite = !thoughts.value[index].isFavorite;
-        stats.value.favoriteThoughts = thoughts.value.filter(
-          (t) => t.isFavorite
-        ).length;
+    const loadMore = async () => {
+      try {
+        if (!isUserSignedIn.value || !userId.value) {
+          return;
+        }
+        loadingMore.value = true;
+        hasMoreThoughts.value = false;
+      } catch (error) {
+      } finally {
+        loadingMore.value = false;
+      }
+    };
+    const toggleFavorite = async (thought) => {
+      try {
+        if (!isUserSignedIn.value || !userId.value) {
+          alert("Please sign in to toggle favorites");
+          return;
+        }
+        const newFavoriteStatus = !thought.isFavorite;
+        const response = await $fetch(`/api/thoughts/${thought.id}`, {
+          method: "PUT",
+          body: { is_favorite: newFavoriteStatus }
+        });
+        if (!response.success) {
+          throw new Error("Failed to update favorite status");
+        }
+        const index = thoughts.value.findIndex((t2) => t2.id === thought.id);
+        if (index !== -1) {
+          thoughts.value[index] = {
+            ...thoughts.value[index],
+            isFavorite: newFavoriteStatus,
+            is_favorite: newFavoriteStatus
+            // Keep both for consistency
+          };
+          updateStats();
+        }
+      } catch (error) {
+        alert(`Failed to update favorite status: ${error.message || error}`);
       }
     };
     const editThought = (thought) => {
@@ -2825,65 +2940,93 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       showModal.value = false;
       currentThought.value = null;
     };
-    const deleteThought = (thought) => {
-      console.log("Delete thought:", thought.id);
+    const deleteThought = async (thought) => {
+      try {
+        if (!isUserSignedIn.value || !userId.value) {
+          alert("Please sign in to delete thoughts");
+          return;
+        }
+        const response = await $fetch(`/api/thoughts/${thought.id}`, {
+          method: "DELETE"
+        });
+        if (!response.success) {
+          throw new Error("Failed to delete thought");
+        }
+        const index = thoughts.value.findIndex((t2) => t2.id === thought.id);
+        if (index !== -1) {
+          thoughts.value.splice(index, 1);
+          updateStats();
+        }
+      } catch (error) {
+        alert(`Failed to delete thought: ${error.message || error}`);
+      }
     };
     const handleThoughtSubmit = async (data) => {
-      var _a;
       const isEdit = !!currentThought.value;
-      console.log(`${isEdit ? "Edit" : "Add"} thought called with:`, data);
       try {
         savingThought.value = true;
-        if (!isLoaded.value) {
-          throw new Error("Authentication still loading, please wait");
+        let authCheckAttempts = 0;
+        const maxAuthAttempts = 30;
+        while (!isLoaded.value && authCheckAttempts < maxAuthAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          authCheckAttempts++;
         }
-        if (!isSignedIn.value || !((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.id)) {
-          throw new Error("User not authenticated");
+        if (!isAuthLoaded.value) {
+          throw new Error("Authentication failed to load. Please refresh the page.");
         }
-        console.log("User authenticated:", user.value.id);
+        if (!isUserSignedIn.value) {
+          throw new Error("Please sign in to save thoughts");
+        }
+        if (!userId.value) {
+          throw new Error("User information not available. Please try signing out and back in.");
+        }
         if (isEdit) {
-          console.log("Updating thought in Supabase:", data);
-          const { data: updatedThought, error } = await db.thoughts.update(
-            currentThought.value.id,
-            {
+          const response = await $fetch(`/api/thoughts/${currentThought.value.id}`, {
+            method: "PUT",
+            body: {
+              title: data.title,
+              content: data.content,
+              color: data.color,
+              tags: data.tags
+            }
+          });
+          if (!response.success) {
+            throw new Error("Failed to update thought");
+          }
+          const index = thoughts.value.findIndex(
+            (t2) => t2.id === currentThought.value.id
+          );
+          if (index !== -1) {
+            thoughts.value[index] = {
+              ...response.data,
+              isFavorite: response.data.is_favorite
+              // Transform snake_case to camelCase
+            };
+          }
+        } else {
+          const response = await $fetch("/api/thoughts", {
+            method: "POST",
+            body: {
               title: data.title,
               content: data.content,
               color: data.color,
               tags: data.tags,
-              updated_at: (/* @__PURE__ */ new Date()).toISOString()
+              user_id: userId.value,
+              is_favorite: false
             }
-          );
-          if (error) {
-            throw error;
-          }
-          const index = thoughts.value.findIndex(
-            (t) => t.id === currentThought.value.id
-          );
-          if (index !== -1) {
-            thoughts.value[index] = updatedThought;
-          }
-          console.log("Thought updated successfully!");
-        } else {
-          console.log("Creating thought in Supabase:", data);
-          const { data: newThought, error } = await db.thoughts.create({
-            title: data.title,
-            content: data.content,
-            color: data.color,
-            tags: data.tags,
-            user_id: user.value.id,
-            is_favorite: false
           });
-          if (error) {
-            throw error;
+          if (!response.success) {
+            throw new Error("Failed to create thought");
           }
-          console.log("New thought created in Supabase:", newThought);
-          thoughts.value.unshift(newThought);
-          console.log("Thought created successfully!");
+          thoughts.value.unshift({
+            ...response.data,
+            isFavorite: response.data.is_favorite
+            // Transform snake_case to camelCase
+          });
         }
         updateStats();
         closeModal();
       } catch (error) {
-        console.error(`Failed to ${isEdit ? "update" : "create"} thought:`, error);
         alert(
           `Failed to ${isEdit ? "update" : "create"} thought: ${error.message}`
         );
@@ -2892,11 +3035,11 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
     };
     const updateStats = () => {
-      const allTags = thoughts.value.flatMap((t) => t.tags);
+      const allTags = thoughts.value.flatMap((t2) => t2.tags);
       const uniqueTags = [...new Set(allTags)];
       stats.value.totalThoughts = thoughts.value.length;
       stats.value.favoriteThoughts = thoughts.value.filter(
-        (t) => t.isFavorite
+        (t2) => t2.isFavorite
       ).length;
       stats.value.totalTags = uniqueTags.length;
     };
@@ -2908,10 +3051,9 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }
     });
     watch(
-      [isLoaded, isSignedIn, user],
-      ([loaded, signedIn, currentUser]) => {
-        if (loaded && signedIn && (currentUser == null ? void 0 : currentUser.id)) {
-          console.log("User authenticated, loading dashboard data");
+      [isAuthLoaded, isUserSignedIn, userId],
+      ([loaded, signedIn, currentUserId]) => {
+        if (loaded && signedIn && currentUserId) {
           loadDashboardData();
         }
       },
@@ -2945,20 +3087,20 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           trend: unref(stats).thoughtsTrend
         }, null, _parent));
         _push(ssrRenderComponent(_component_StatCard, {
-          title: "Favorites",
+          title: _ctx.$t("thoughts.favorites") || "Favorites",
           value: unref(stats).favoriteThoughts,
           icon: "lucide:heart",
           color: "red"
         }, null, _parent));
         _push(ssrRenderComponent(_component_StatCard, {
-          title: "This Month",
+          title: _ctx.$t("stats.thisMonth") || "This Month",
           value: unref(stats).monthlyThoughts,
           icon: "lucide:calendar",
           color: "purple",
           trend: unref(stats).monthlyTrend
         }, null, _parent));
         _push(ssrRenderComponent(_component_StatCard, {
-          title: "Tags Used",
+          title: _ctx.$t("stats.tagsUsed") || "Tags Used",
           value: unref(stats).totalTags,
           icon: "lucide:hash",
           color: "green"
@@ -2986,10 +3128,10 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
       }, {
         default: withCtx((_, _push2, _parent2, _scopeId) => {
           if (_push2) {
-            _push2(`${ssrInterpolate(unref(showFavorites) ? "All" : "Favorites")}`);
+            _push2(`${ssrInterpolate(unref(showFavorites) ? _ctx.$t("thoughts.all") || "All" : _ctx.$t("thoughts.favorites") || "Favorites")}`);
           } else {
             return [
-              createTextVNode(toDisplayString(unref(showFavorites) ? "All" : "Favorites"), 1)
+              createTextVNode(toDisplayString(unref(showFavorites) ? _ctx.$t("thoughts.all") || "All" : _ctx.$t("thoughts.favorites") || "Favorites"), 1)
             ];
           }
         }),
@@ -3011,7 +3153,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
           name: "lucide:lightbulb",
           class: "mx-auto h-12 w-12 text-gray-400"
         }, null, _parent));
-        _push(`<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">${ssrInterpolate(unref(searchQuery) ? "No thoughts found" : _ctx.$t("thoughts.empty"))}</h3><p class="mt-1 text-sm text-gray-500 dark:text-gray-400">${ssrInterpolate(unref(searchQuery) ? "Try adjusting your search or filters" : "Start by adding your first brilliant idea!")}</p>`);
+        _push(`<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">${ssrInterpolate(unref(searchQuery) ? _ctx.$t("thoughts.noResults") || "No thoughts found" : _ctx.$t("thoughts.empty"))}</h3><p class="mt-1 text-sm text-gray-500 dark:text-gray-400">${ssrInterpolate(unref(searchQuery) ? _ctx.$t("thoughts.tryAdjusting") || "Try adjusting your search or filters" : _ctx.$t("thoughts.startAdding") || "Start by adding your first brilliant idea!")}</p>`);
         _push(ssrRenderComponent(_component_UButton, {
           color: "primary",
           class: "mt-4 cursor-pointer",
@@ -3021,7 +3163,16 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
         }, null, _parent));
         _push(`</div>`);
       } else {
-        _push(`<div class="space-y-6"><div class="flex items-center justify-between"><h2 class="text-xl font-semibold text-gray-900 dark:text-white">${ssrInterpolate(unref(searchQuery) ? "Search Results" : "Recent Thoughts")}</h2><p class="text-sm text-gray-500 dark:text-gray-400">${ssrInterpolate(unref(filteredThoughts).length)} ${ssrInterpolate(unref(filteredThoughts).length === 1 ? "thought" : "thoughts")}</p></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"><!--[-->`);
+        _push(`<div class="space-y-6"><div class="flex items-center justify-between"><h2 class="text-xl font-semibold text-gray-900 dark:text-white">${ssrInterpolate(unref(searchQuery) ? _ctx.$t("thoughts.searchResults") || "Search Results" : _ctx.$t("thoughts.recent") || "Recent Thoughts")}</h2><div class="flex items-center gap-3"><p class="text-sm text-gray-500 dark:text-gray-400">${ssrInterpolate(unref(filteredThoughts).length)} ${ssrInterpolate(unref(filteredThoughts).length === 1 ? _ctx.$t("thoughts.thoughtSingle") || "thought" : _ctx.$t("thoughts.thoughtPlural") || "thoughts")}</p>`);
+        _push(ssrRenderComponent(_component_UButton, {
+          color: "primary",
+          size: "sm",
+          icon: "lucide:plus",
+          label: _ctx.$t("thoughts.add") || "Add Thought",
+          class: "cursor-pointer",
+          onClick: openAddModal
+        }, null, _parent));
+        _push(`</div></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"><!--[-->`);
         ssrRenderList(unref(filteredThoughts), (thought) => {
           _push(ssrRenderComponent(_component_ThoughtCard, {
             key: thought.id,
@@ -3040,7 +3191,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
             color: "gray",
             loading: unref(loadingMore),
             icon: "lucide:chevron-down",
-            label: "Load More",
+            label: _ctx.$t("ui.loadMore") || "Load More",
             class: "cursor-pointer",
             onClick: loadMore
           }, null, _parent));
@@ -3070,4 +3221,4 @@ _sfc_main.setup = (props, ctx) => {
 };
 
 export { _sfc_main as default };
-//# sourceMappingURL=index-B267tVdg.mjs.map
+//# sourceMappingURL=index-7BD4GoSA.mjs.map

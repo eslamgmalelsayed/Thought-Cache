@@ -61,19 +61,30 @@
         </span>
       </div>
 
-      <!-- Bottom row with date and edit button -->
+      <!-- Bottom row with date and action buttons -->
       <div class="flex items-center justify-between w-full space-x-2">
         <div class="text-white/70 text-xs">
           {{ formatDate(thought.createdAt) }}
         </div>
-        <UButton
-          color="neutral"
-          size="xs"
-          :label="$t('thoughts.edit') || 'Edit'"
-          icon="lucide:edit"
-          class="cursor-pointer"
-          @click.stop="$emit('edit', thought)"
-        />
+        <div class="flex items-center space-x-1">
+          <UButton
+            color="neutral"
+            size="xs"
+            :label="$t('ui.edit') || 'Edit'"
+            icon="lucide:edit"
+            class="cursor-pointer"
+            @click.stop="$emit('edit', thought)"
+          />
+          <UButton
+            color="red"
+            variant="soft"
+            size="xs"
+            :label="$t('ui.delete') || 'Delete'"
+            icon="lucide:trash-2"
+            class="cursor-pointer"
+            @click.stop="$emit('delete', thought)"
+          />
+        </div>
       </div>
     </div>
   </div>

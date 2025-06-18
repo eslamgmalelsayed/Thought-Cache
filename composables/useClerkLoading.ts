@@ -35,22 +35,46 @@ export const useClerkLoading = () => {
 
         // Watch for Clerk to be ready
         if (import.meta.client) {
+            let checkAttempts = 0
+            const maxAttempts = 50 // 5 seconds max
+            
             const checkClerkReady = () => {
                 try {
+                    checkAttempts++
+                    
                     // Check if Clerk is available and ready
                     const clerk = window?.Clerk
                     if (clerk?.loaded) {
                         stopLoading()
-                    } else {
-                        setTimeout(checkClerkReady, 100)
+                        return
                     }
+                    
+                    // Stop checking after max attempts
+                    if (checkAttempts >= maxAttempts) {
+                        stopLoading()
+                        return
+                    }
+                    
+                    setTimeout(checkClerkReady, 100)
                 } catch {
-                    // Continue checking
+                    // Stop checking after max attempts
+                    if (checkAttempts >= maxAttempts) {
+                        stopLoading()
+                        return
+                    }
+                    
                     setTimeout(checkClerkReady, 100)
                 }
             }
 
             checkClerkReady()
+        } else {
+            // If not on client, stop loading after timeout
+            setTimeout(() => {
+                if (isLoading.value) {
+                    stopLoading()
+                }
+            }, 3000)
         }
     })
 

@@ -28,8 +28,7 @@ export default defineEventHandler(async (_event) => {
                 total: thoughts?.length || 0
             }
         }
-    } catch (error) {
-        console.error('Error fetching thoughts:', error)
+    } catch {
         throw createError({
             statusCode: 500,
             statusMessage: 'Internal server error'

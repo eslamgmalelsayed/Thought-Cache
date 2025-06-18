@@ -22,43 +22,45 @@
           <!-- User Avatar & Preferences -->
           <div v-if="isLoaded && isSignedIn" class="relative">
             <!-- Avatar Button -->
-            <UButton
-              variant="ghost"
-              color="gray"
-              class="p-1 cursor-pointer"
+            <div
+              class="cursor-pointer"
               @click="toggleUserMenu"
             >
-              <div class="flex items-center">
-                <div
-                  v-if="avatarUrl"
-                  class="h-8 w-8 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-600"
+              <div v-if="avatarUrl" class="relative">
+                <img
+                  :src="avatarUrl"
+                  :alt="userDisplayName"
+                  class="h-10 w-10 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 hover:ring-primary-500 transition-all duration-200"
+                  @error="onImageError"
+                  @load="onImageLoad"
                 >
-                  <img
-                    :src="avatarUrl"
-                    :alt="userDisplayName"
-                    class="w-full h-full object-cover"
-                    @error="onImageError"
-                    @load="onImageLoad"
-                  >
-                </div>
-                <div
-                  v-else
-                  class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600"
-                >
-                  <span class="text-white text-sm font-medium">
-                    {{ userInitials }}
-                  </span>
-                </div>
               </div>
-            </UButton>
+              <div v-else class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600 hover:ring-primary-500 transition-all duration-200">
+                <span class="text-white text-sm font-medium">
+                  {{ userInitials }}
+                </span>
+              </div>
+            </div>
 
             <!-- Dropdown Menu -->
             <div
               v-if="showUserMenu"
-              class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+              class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
             >
-              <div class="p-3">
-                <!-- Dark Mode Toggle -->
+              <div class="p-4">
+                <!-- User Info Section -->
+                <div class="pb-3 border-b border-gray-200 dark:border-gray-700">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {{ userDisplayName }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {{ userEmail }}
+                  </p>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="pt-3">
+                  <!-- Dark Mode Toggle -->
                 <div class="flex items-center justify-between py-2">
                   <div class="flex items-center">
                     <UIcon
@@ -108,6 +110,7 @@
                 >
                   {{ t("auth.signOut") || "Sign Out" }}
                 </UButton>
+                </div>
               </div>
             </div>
           </div>
@@ -137,6 +140,36 @@
 // User authentication (auto-imported from @clerk/nuxt)
 const { user, isLoaded, isSignedIn } = useAuth();
 
+// Alternative Clerk access
+const clerkUser = ref(null);
+const clerkLoaded = ref(false);
+const clerkSignedIn = ref(false);
+
+// Check Clerk directly
+const checkClerkAuth = () => {
+  if (import.meta.client && window.Clerk) {
+    clerkLoaded.value = window.Clerk.loaded || false;
+    clerkSignedIn.value = !!window.Clerk.user;
+    clerkUser.value = window.Clerk.user || null;
+  }
+};
+
+// Watch for Clerk changes
+if (import.meta.client) {
+  onMounted(() => {
+    checkClerkAuth();
+    
+    // Set up interval to check Clerk status
+    const interval = setInterval(() => {
+      checkClerkAuth();
+    }, 1000);
+    
+    onUnmounted(() => {
+      clearInterval(interval);
+    });
+  });
+}
+
 // User menu state
 const showUserMenu = ref(false);
 
@@ -156,101 +189,83 @@ if (import.meta.client) {
   });
 }
 
-// Debug user object
-watch(
-  () => user?.value,
-  (newUser) => {
-    try {
-      if (newUser) {
-        console.log("User object:", newUser);
-        console.log("Image URLs:", {
-          imageUrl: newUser.imageUrl,
-          profileImageUrl: newUser.profileImageUrl,
-          hasImage: !!(newUser.imageUrl || newUser.profileImageUrl),
-        });
-      }
-    } catch (error) {
-      console.error("Error in user watcher:", error);
-    }
-  },
-  { immediate: true }
-);
+
 
 // Image loading handlers
-const onImageError = (event) => {
-  console.error("Avatar image failed to load:", event.target.src);
-  console.log("User object at error:", user.value);
+const onImageError = (_event) => {
+  // Avatar image failed to load
+  _event.target.style.display = 'none';
 };
 
-const onImageLoad = (event) => {
-  console.log("Avatar image loaded successfully:", event.target.src);
+const onImageLoad = (_event) => {
+  // Avatar image loaded successfully
 };
 
-// Computed properties for user display
+// Computed properties for user display (using dual auth approach)
 const avatarUrl = computed(() => {
-  if (!user || !user.value) return null;
-
-  try {
-    // Try different possible image properties from Clerk
-    return (
-      user.value.imageUrl ||
-      user.value.profileImageUrl ||
-      user.value.profileImageURL ||
-      user.value.avatar ||
-      user.value.picture ||
-      null
-    );
-  } catch (error) {
-    console.error("Error accessing user avatar:", error);
-    return null;
-  }
+  // Try useAuth first
+  const authAvatar = user?.value?.imageUrl || user?.value?.profileImageUrl || user?.value?.avatar;
+  if (authAvatar) return authAvatar;
+  
+  // Try direct Clerk access
+  const clerkAvatar = clerkUser.value?.imageUrl || clerkUser.value?.profileImageUrl || clerkUser.value?.avatar;
+  if (clerkAvatar) return clerkAvatar;
+  
+  return null;
 });
 
 const userDisplayName = computed(() => {
-  if (!user || !user.value) return "User";
+  // Try useAuth first
+  const authName = user?.value?.fullName || user?.value?.firstName || user?.value?.name;
+  if (authName) return authName;
+  
+  // Try direct Clerk access
+  const clerkName = clerkUser.value?.fullName || clerkUser.value?.firstName || clerkUser.value?.name;
+  if (clerkName) return clerkName;
+  
+  return 'User';
+});
 
-  try {
-    return (
-      user.value.fullName ||
-      user.value.firstName ||
-      user.value.name ||
-      user.value.username ||
-      "User"
-    );
-  } catch (error) {
-    console.error("Error accessing user display name:", error);
-    return "User";
-  }
+const userEmail = computed(() => {
+  // Try useAuth first
+  const authEmail = user?.value?.emailAddresses?.[0]?.emailAddress || 
+                   user?.value?.primaryEmailAddress?.emailAddress ||
+                   user?.value?.email;
+  if (authEmail) return authEmail;
+  
+  // Try direct Clerk access - based on the structure you showed
+  const clerkEmail = clerkUser.value?.primaryEmailAddress?.emailAddress ||
+                    clerkUser.value?.emailAddresses?.[0]?.emailAddress ||
+                    clerkUser.value?.email;
+  if (clerkEmail) return clerkEmail;
+  
+  return null;
 });
 
 const userInitials = computed(() => {
-  if (!user || !user.value) return "U";
-
-  try {
-    const firstName = user.value.firstName || "";
-    const lastName = user.value.lastName || "";
-
-    if (firstName && lastName) {
-      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-    } else if (firstName) {
-      return firstName.charAt(0).toUpperCase();
-    } else if (user.value.fullName) {
-      const names = user.value.fullName.split(" ");
-      if (names.length >= 2) {
-        return `${names[0].charAt(0)}${names[names.length - 1].charAt(
-          0
-        )}`.toUpperCase();
-      }
-      return names[0].charAt(0).toUpperCase();
-    } else if (user.value.username) {
-      return user.value.username.charAt(0).toUpperCase();
-    }
-
-    return "U";
-  } catch (error) {
-    console.error("Error accessing user initials:", error);
-    return "U";
+  // Try useAuth first
+  let firstName = user?.value?.firstName || '';
+  let lastName = user?.value?.lastName || '';
+  
+  // Try direct Clerk access if useAuth doesn't have the data
+  if (!firstName && !lastName) {
+    firstName = clerkUser.value?.firstName || '';
+    lastName = clerkUser.value?.lastName || '';
   }
+  
+  if (firstName && lastName) {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  } else if (firstName) {
+    return firstName.charAt(0).toUpperCase();
+  } else if (userDisplayName.value && userDisplayName.value !== 'User') {
+    const names = userDisplayName.value.split(' ');
+    if (names.length >= 2) {
+      return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+    }
+    return names[0].charAt(0).toUpperCase();
+  }
+  
+  return 'U';
 });
 
 // Theme management
@@ -274,9 +289,7 @@ const handleSignOut = async () => {
     if (import.meta.client && window.Clerk) {
       await window.Clerk.signOut();
     }
-    await navigateTo("/sign-in");
-  } catch (error) {
-    console.error("Sign out error:", error);
+  } finally {
     await navigateTo("/sign-in");
   }
 };

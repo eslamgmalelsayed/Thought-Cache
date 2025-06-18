@@ -1,5 +1,5 @@
 import { defineComponent, shallowRef, h, resolveComponent, mergeProps, unref, inject, provide, computed, toValue, ref, watch, withCtx, createVNode, resolveDynamicComponent, renderSlot, createBlock, openBlock, toDisplayString as toDisplayString$1, useSlots, createCommentVNode, effectScope, getCurrentInstance, cloneVNode, createElementBlock, toRef as toRef$1, isRef, getCurrentScope, onScopeDispose, hasInjectionContext, onServerPrefetch, toRefs, reactive, nextTick, defineAsyncComponent, useSSRContext, shallowReactive, Suspense, Fragment, createApp, Text, readonly, customRef, renderList, useId, onErrorCaptured, isReadonly, isShallow, isReactive, toRaw, createTextVNode, withModifiers, markRaw } from 'vue';
-import { s as serialize, l as klona, m as defuFn, o as defu, q as sanitizeStatusCode, r as isEqual$1, t as getContext, c as createError$1, $ as $fetch$1, v as baseURL, w as createHooks, x as executeAsync, y as toRouteMatcher, z as createRouter$1, A as getRequestProtocol, B as destr, C as getRequestHeaders, D as getRequestHeader, E as setCookie, F as getCookie, G as deleteCookie } from '../_/nitro.mjs';
+import { s as serialize, m as klona, o as defuFn, q as defu, t as sanitizeStatusCode, v as isEqual$1, w as getContext, c as createError$1, $ as $fetch$1, x as baseURL, y as createHooks, z as executeAsync, A as toRouteMatcher, B as createRouter$1, C as getRequestProtocol, D as destr, E as getRequestHeaders, F as getRequestHeader, G as setCookie, H as getCookie, I as deleteCookie } from '../_/nitro.mjs';
 import { useRoute as useRoute$1, RouterView, createMemoryHistory, createRouter, START_LOCATION, isNavigationFailure } from 'vue-router';
 import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import { clerkPlugin } from '@clerk/vue';
@@ -852,37 +852,37 @@ const _routes = [
     name: "index___en",
     path: "/",
     meta: { ...__nuxt_page_meta$2 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-B267tVdg.mjs')
+    component: () => import('./index-7BD4GoSA.mjs')
   },
   {
     name: "index___ar",
     path: "/ar",
     meta: { ...__nuxt_page_meta$2 || {}, ...{ "middleware": "auth" } },
-    component: () => import('./index-B267tVdg.mjs')
+    component: () => import('./index-7BD4GoSA.mjs')
   },
   {
     name: "sign-in___en",
     path: "/sign-in",
     meta: { ...__nuxt_page_meta$1 || {}, ...{ "middleware": "guest" } },
-    component: () => import('./sign-in-C9K-9UGI.mjs')
+    component: () => import('./sign-in-BXhZmFJl.mjs')
   },
   {
     name: "sign-in___ar",
     path: "/ar/sign-in",
     meta: { ...__nuxt_page_meta$1 || {}, ...{ "middleware": "guest" } },
-    component: () => import('./sign-in-C9K-9UGI.mjs')
+    component: () => import('./sign-in-BXhZmFJl.mjs')
   },
   {
     name: "sign-up___en",
     path: "/sign-up",
     meta: { ...__nuxt_page_meta || {}, ...{ "middleware": "guest" } },
-    component: () => import('./sign-up-7CK0Cl-T.mjs')
+    component: () => import('./sign-up-BxReYZ-p.mjs')
   },
   {
     name: "sign-up___ar",
     path: "/ar/sign-up",
     meta: { ...__nuxt_page_meta || {}, ...{ "middleware": "guest" } },
-    component: () => import('./sign-up-7CK0Cl-T.mjs')
+    component: () => import('./sign-up-BxReYZ-p.mjs')
   }
 ];
 const _wrapInTransition = (props, children) => {
@@ -1014,9 +1014,9 @@ const globalMiddleware = [
   manifest_45route_45rule
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-Diu9Ip3Z.mjs'),
-  guest: () => import('./guest-BOefEpVp.mjs'),
-  loading: () => import('./loading-BDZbEAnI.mjs')
+  auth: () => import('./auth-DSYYuswf.mjs'),
+  guest: () => import('./guest-BIJdZhyc.mjs'),
+  loading: () => import('./loading-DinE7ReL.mjs')
 };
 const plugin = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -1350,6 +1350,15 @@ const resource$1 = {
     "favorite": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Favorite" } },
     "search": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Search thoughts..." } },
     "empty": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "No thoughts yet. Start by adding your first idea!" } },
+    "recent": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Recent Thoughts" } },
+    "searchResults": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Search Results" } },
+    "thoughtSingle": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "thought" } },
+    "thoughtPlural": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "thoughts" } },
+    "all": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "All" } },
+    "favorites": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Favorites" } },
+    "noResults": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "No thoughts found" } },
+    "tryAdjusting": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Try adjusting your search or filters" } },
+    "startAdding": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Start by adding your first brilliant idea!" } },
     "form": {
       "title": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Title" } },
       "content": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Content" } },
@@ -1387,11 +1396,16 @@ const resource$1 = {
     "error": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "An error occurred" } },
     "success": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Success!" } },
     "confirm": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Are you sure?" } },
+    "loadMore": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Load More" } },
     "theme": {
       "light": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Light" } },
       "dark": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Dark" } },
       "system": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "System" } }
     }
+  },
+  "stats": {
+    "thisMonth": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "This Month" } },
+    "tagsUsed": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "Tags Used" } }
   },
   "validation": {
     "required": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "This field is required" } },
@@ -1430,6 +1444,15 @@ const resource = {
     "favorite": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "مفضلة" } },
     "search": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "البحث في الأفكار..." } },
     "empty": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "لا توجد أفكار بعد. ابدأ بإضافة فكرتك الأولى!" } },
+    "recent": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "الأفكار الحديثة" } },
+    "searchResults": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "نتائج البحث" } },
+    "thoughtSingle": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "فكرة" } },
+    "thoughtPlural": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "أفكار" } },
+    "all": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "الكل" } },
+    "favorites": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "المفضلة" } },
+    "noResults": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "لم يتم العثور على أفكار" } },
+    "tryAdjusting": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "حاول تعديل البحث أو المرشحات" } },
+    "startAdding": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "ابدأ بإضافة فكرتك الرائعة الأولى!" } },
     "form": {
       "title": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "العنوان" } },
       "content": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "المحتوى" } },
@@ -1467,11 +1490,16 @@ const resource = {
     "error": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "حدث خطأ" } },
     "success": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "نجح!" } },
     "confirm": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "هل أنت متأكد؟" } },
+    "loadMore": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "تحميل المزيد" } },
     "theme": {
       "light": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "فاتح" } },
       "dark": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "داكن" } },
       "system": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "النظام" } }
     }
+  },
+  "stats": {
+    "thisMonth": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "هذا الشهر" } },
+    "tagsUsed": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "العلامات المستخدمة" } }
   },
   "validation": {
     "required": { "t": 0, "b": { "t": 2, "i": [{ "t": 3 }], "s": "هذا الحقل مطلوب" } },
@@ -10158,7 +10186,7 @@ _sfc_main$3.setup = (props, ctx) => {
   return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
 };
 const layouts = {
-  default: defineAsyncComponent(() => import('./default-BY50yKXB.mjs').then((m) => m.default || m))
+  default: defineAsyncComponent(() => import('./default-CxSAQJBH.mjs').then((m) => m.default || m))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
@@ -10537,5 +10565,5 @@ let entry;
 }
 const entry$1 = (ssrContext) => entry(ssrContext);
 
-export { __nuxt_component_0$1 as _, _sfc_main$b as a, useAppConfig as b, useFormField as c, useButtonGroup as d, entry$1 as default, useComponentIcons as e, _sfc_main$a as f, _sfc_main$7 as g, useLocale as h, usePortal as i, useRuntimeConfig as j, __nuxt_component_1$1 as k, looseToNumber as l, defineNuxtRouteMiddleware as m, useState as n, useI18n as o, navigateTo as p, reactivePick as r, tv as t, useHead as u };
+export { __nuxt_component_0$1 as _, _sfc_main$b as a, useAppConfig as b, useFormField as c, useButtonGroup as d, entry$1 as default, useComponentIcons as e, _sfc_main$a as f, _sfc_main$7 as g, useLocale as h, usePortal as i, useRuntimeConfig as j, useI18n as k, looseToNumber as l, __nuxt_component_1$1 as m, defineNuxtRouteMiddleware as n, useState as o, navigateTo as p, reactivePick as r, tv as t, useHead as u };
 //# sourceMappingURL=server.mjs.map

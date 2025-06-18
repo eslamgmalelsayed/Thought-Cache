@@ -1,4 +1,4 @@
-import { m as defineNuxtRouteMiddleware } from './server.mjs';
+import { n as defineNuxtRouteMiddleware } from './server.mjs';
 import 'vue';
 import '../_/nitro.mjs';
 import 'node:http';
@@ -37,4 +37,4 @@ const guest = defineNuxtRouteMiddleware(async () => {
 });
 
 export { guest as default };
-//# sourceMappingURL=guest-BOefEpVp.mjs.map
+//# sourceMappingURL=guest-BIJdZhyc.mjs.map

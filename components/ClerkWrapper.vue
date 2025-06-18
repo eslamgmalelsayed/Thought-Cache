@@ -92,15 +92,41 @@ onMounted(() => {
 
   // Check for Clerk readiness
   if (import.meta.client) {
+    let attempts = 0;
+    const maxAttempts = Math.floor(props.timeout / 100); // Based on timeout
+    
     const checkClerk = () => {
-      const clerk = window?.Clerk;
-      if (clerk?.loaded) {
-        stopLoading();
-      } else {
+      attempts++;
+      
+      try {
+        const clerk = window?.Clerk;
+        if (clerk?.loaded) {
+          stopLoading();
+          return;
+        }
+        
+        if (attempts >= maxAttempts) {
+          setError();
+          return;
+        }
+        
+        setTimeout(checkClerk, 100);
+      } catch {
+        if (attempts >= maxAttempts) {
+          setError();
+          return;
+        }
         setTimeout(checkClerk, 100);
       }
     };
     checkClerk();
+  } else {
+    // Server-side, just use timeout
+    setTimeout(() => {
+      if (isLoading.value) {
+        stopLoading();
+      }
+    }, 1000);
   }
 });
 

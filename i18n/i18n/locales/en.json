@@ -33,6 +33,7 @@
     "searchResults": "Search Results",
     "thoughtSingle": "thought",
     "thoughtPlural": "thoughts",
+    "total": "Total Thoughts",
     "all": "All",
     "favorites": "Favorites",
     "noResults": "No thoughts found",
@@ -85,6 +86,11 @@
   "stats": {
     "thisMonth": "This Month",
     "tagsUsed": "Tags Used"
+  },
+  "user": {
+    "verified": "Verified",
+    "memberSince": "Member since",
+    "profile": "Profile"
   },
   "validation": {
     "required": "This field is required",

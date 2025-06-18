@@ -33,6 +33,7 @@
     "searchResults": "نتائج البحث",
     "thoughtSingle": "فكرة",
     "thoughtPlural": "أفكار",
+    "total": "إجمالي الأفكار",
     "all": "الكل",
     "favorites": "المفضلة",
     "noResults": "لم يتم العثور على أفكار",
@@ -85,6 +86,11 @@
   "stats": {
     "thisMonth": "هذا الشهر",
     "tagsUsed": "العلامات المستخدمة"
+  },
+  "user": {
+    "verified": "موثق",
+    "memberSince": "عضو منذ",
+    "profile": "الملف الشخصي"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

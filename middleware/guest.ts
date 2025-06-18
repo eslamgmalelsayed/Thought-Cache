@@ -33,7 +33,7 @@ export default defineNuxtRouteMiddleware(async () => {
 
             // Short timeout - don't block guest pages
             timeoutId = setTimeout(() => {
-                console.warn('Guest check timeout, allowing navigation')
+                // Guest check timeout, allowing navigation
                 cleanup()
                 resolve()
             }, 1000) // Even shorter for guest pages
@@ -44,8 +44,7 @@ export default defineNuxtRouteMiddleware(async () => {
             return navigateTo('/')
         }
 
-    } catch (error) {
-        // If guest check fails, log and allow navigation
-        console.warn('Guest middleware error:', error)
+    } catch {
+        // If guest check fails, allow navigation
     }
 }) 

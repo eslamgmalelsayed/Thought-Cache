@@ -1,5 +1,5 @@
-import { b as useAppConfig, r as reactivePick, c as useFormField, t as tv, a as _sfc_main$b, o as useI18n, g as _sfc_main$7, p as navigateTo, n as useState } from './server.mjs';
-import { useSSRContext, defineComponent, mergeModels, useSlots, useModel, useId, computed, unref, mergeProps, withCtx, createBlock, openBlock, Fragment, createCommentVNode, createVNode, renderSlot, createTextVNode, toDisplayString, ref, watch } from 'vue';
+import { b as useAppConfig, r as reactivePick, c as useFormField, t as tv, a as _sfc_main$b, k as useI18n, g as _sfc_main$7, p as navigateTo, o as useState } from './server.mjs';
+import { useSSRContext, defineComponent, mergeModels, useSlots, useModel, useId, computed, unref, mergeProps, withCtx, createBlock, openBlock, Fragment, createCommentVNode, createVNode, renderSlot, createTextVNode, toDisplayString, ref } from 'vue';
 import { ssrRenderComponent, ssrRenderClass, ssrRenderSlot, ssrInterpolate, ssrRenderAttrs, ssrRenderAttr } from 'vue/server-renderer';
 import { useForwardProps, Primitive, SwitchRoot, SwitchThumb, Label } from 'reka-ui';
 import { useAuth } from '@clerk/vue';
@@ -437,78 +437,54 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
   __ssrInlineRender: true,
   setup(__props) {
     const { user, isLoaded, isSignedIn } = useAuth();
+    const clerkUser = ref(null);
+    ref(false);
+    ref(false);
     const showUserMenu = ref(false);
-    const toggleUserMenu = () => {
-      showUserMenu.value = !showUserMenu.value;
-    };
-    watch(
-      () => user == null ? void 0 : user.value,
-      (newUser) => {
-        try {
-          if (newUser) {
-            console.log("User object:", newUser);
-            console.log("Image URLs:", {
-              imageUrl: newUser.imageUrl,
-              profileImageUrl: newUser.profileImageUrl,
-              hasImage: !!(newUser.imageUrl || newUser.profileImageUrl)
-            });
-          }
-        } catch (error) {
-          console.error("Error in user watcher:", error);
-        }
-      },
-      { immediate: true }
-    );
-    const onImageError = (event) => {
-      console.error("Avatar image failed to load:", event.target.src);
-      console.log("User object at error:", user.value);
-    };
-    const onImageLoad = (event) => {
-      console.log("Avatar image loaded successfully:", event.target.src);
-    };
     const avatarUrl = computed(() => {
-      if (!user || !user.value) return null;
-      try {
-        return user.value.imageUrl || user.value.profileImageUrl || user.value.profileImageURL || user.value.avatar || user.value.picture || null;
-      } catch (error) {
-        console.error("Error accessing user avatar:", error);
-        return null;
-      }
+      var _a, _b, _c, _d, _e, _f;
+      const authAvatar = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.imageUrl) || ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.profileImageUrl) || ((_c = user == null ? void 0 : user.value) == null ? void 0 : _c.avatar);
+      if (authAvatar) return authAvatar;
+      const clerkAvatar = ((_d = clerkUser.value) == null ? void 0 : _d.imageUrl) || ((_e = clerkUser.value) == null ? void 0 : _e.profileImageUrl) || ((_f = clerkUser.value) == null ? void 0 : _f.avatar);
+      if (clerkAvatar) return clerkAvatar;
+      return null;
     });
     const userDisplayName = computed(() => {
-      if (!user || !user.value) return "User";
-      try {
-        return user.value.fullName || user.value.firstName || user.value.name || user.value.username || "User";
-      } catch (error) {
-        console.error("Error accessing user display name:", error);
-        return "User";
-      }
+      var _a, _b, _c, _d, _e, _f;
+      const authName = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.fullName) || ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.firstName) || ((_c = user == null ? void 0 : user.value) == null ? void 0 : _c.name);
+      if (authName) return authName;
+      const clerkName = ((_d = clerkUser.value) == null ? void 0 : _d.fullName) || ((_e = clerkUser.value) == null ? void 0 : _e.firstName) || ((_f = clerkUser.value) == null ? void 0 : _f.name);
+      if (clerkName) return clerkName;
+      return "User";
+    });
+    const userEmail = computed(() => {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+      const authEmail = ((_c = (_b = (_a = user == null ? void 0 : user.value) == null ? void 0 : _a.emailAddresses) == null ? void 0 : _b[0]) == null ? void 0 : _c.emailAddress) || ((_e = (_d = user == null ? void 0 : user.value) == null ? void 0 : _d.primaryEmailAddress) == null ? void 0 : _e.emailAddress) || ((_f = user == null ? void 0 : user.value) == null ? void 0 : _f.email);
+      if (authEmail) return authEmail;
+      const clerkEmail = ((_h = (_g = clerkUser.value) == null ? void 0 : _g.primaryEmailAddress) == null ? void 0 : _h.emailAddress) || ((_k = (_j = (_i = clerkUser.value) == null ? void 0 : _i.emailAddresses) == null ? void 0 : _j[0]) == null ? void 0 : _k.emailAddress) || ((_l = clerkUser.value) == null ? void 0 : _l.email);
+      if (clerkEmail) return clerkEmail;
+      return null;
     });
     const userInitials = computed(() => {
-      if (!user || !user.value) return "U";
-      try {
-        const firstName = user.value.firstName || "";
-        const lastName = user.value.lastName || "";
-        if (firstName && lastName) {
-          return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-        } else if (firstName) {
-          return firstName.charAt(0).toUpperCase();
-        } else if (user.value.fullName) {
-          const names = user.value.fullName.split(" ");
-          if (names.length >= 2) {
-            return `${names[0].charAt(0)}${names[names.length - 1].charAt(
-              0
-            )}`.toUpperCase();
-          }
-          return names[0].charAt(0).toUpperCase();
-        } else if (user.value.username) {
-          return user.value.username.charAt(0).toUpperCase();
-        }
-        return "U";
-      } catch (error) {
-        console.error("Error accessing user initials:", error);
-        return "U";
+      var _a, _b, _c, _d;
+      let firstName = ((_a = user == null ? void 0 : user.value) == null ? void 0 : _a.firstName) || "";
+      let lastName = ((_b = user == null ? void 0 : user.value) == null ? void 0 : _b.lastName) || "";
+      if (!firstName && !lastName) {
+        firstName = ((_c = clerkUser.value) == null ? void 0 : _c.firstName) || "";
+        lastName = ((_d = clerkUser.value) == null ? void 0 : _d.lastName) || "";
       }
+      if (firstName && lastName) {
+        return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+      } else if (firstName) {
+        return firstName.charAt(0).toUpperCase();
+      } else if (userDisplayName.value && userDisplayName.value !== "User") {
+        const names = userDisplayName.value.split(" ");
+        if (names.length >= 2) {
+          return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+        }
+        return names[0].charAt(0).toUpperCase();
+      }
+      return "U";
     });
     const colorMode = useColorMode();
     const toggleDarkMode = (isDark) => {
@@ -524,14 +500,13 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
         if (false) ;
         await navigateTo("/sign-in");
       } catch (error) {
-        console.error("Sign out error:", error);
         await navigateTo("/sign-in");
       }
     };
     return (_ctx, _push, _parent, _attrs) => {
       const _component_UIcon = _sfc_main$b;
-      const _component_UButton = _sfc_main$7;
       const _component_USwitch = _sfc_main$2;
+      const _component_UButton = _sfc_main$7;
       _push(`<header${ssrRenderAttrs(mergeProps({ class: "bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700" }, _attrs))}><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div class="flex h-16 justify-between"><div class="flex items-center"><div class="flex items-center">`);
       _push(ssrRenderComponent(_component_UIcon, {
         name: "lucide:lightbulb",
@@ -539,50 +514,15 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
       }, null, _parent));
       _push(`<h1 class="ml-3 text-xl font-bold text-gray-900 dark:text-white">${ssrInterpolate(_ctx.$t("app.name") || "Thought Cache")}</h1></div></div><div class="flex items-center space-x-4">`);
       if (unref(isLoaded) && unref(isSignedIn)) {
-        _push(`<div class="relative">`);
-        _push(ssrRenderComponent(_component_UButton, {
-          variant: "ghost",
-          color: "gray",
-          class: "p-1 cursor-pointer",
-          onClick: toggleUserMenu
-        }, {
-          default: withCtx((_, _push2, _parent2, _scopeId) => {
-            if (_push2) {
-              _push2(`<div class="flex items-center"${_scopeId}>`);
-              if (unref(avatarUrl)) {
-                _push2(`<div class="h-8 w-8 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-600"${_scopeId}><img${ssrRenderAttr("src", unref(avatarUrl))}${ssrRenderAttr("alt", unref(userDisplayName))} class="w-full h-full object-cover"${_scopeId}></div>`);
-              } else {
-                _push2(`<div class="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600"${_scopeId}><span class="text-white text-sm font-medium"${_scopeId}>${ssrInterpolate(unref(userInitials))}</span></div>`);
-              }
-              _push2(`</div>`);
-            } else {
-              return [
-                createVNode("div", { class: "flex items-center" }, [
-                  unref(avatarUrl) ? (openBlock(), createBlock("div", {
-                    key: 0,
-                    class: "h-8 w-8 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-600"
-                  }, [
-                    createVNode("img", {
-                      src: unref(avatarUrl),
-                      alt: unref(userDisplayName),
-                      class: "w-full h-full object-cover",
-                      onError: onImageError,
-                      onLoad: onImageLoad
-                    }, null, 40, ["src", "alt"])
-                  ])) : (openBlock(), createBlock("div", {
-                    key: 1,
-                    class: "h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600"
-                  }, [
-                    createVNode("span", { class: "text-white text-sm font-medium" }, toDisplayString(unref(userInitials)), 1)
-                  ]))
-                ])
-              ];
-            }
-          }),
-          _: 1
-        }, _parent));
+        _push(`<div class="relative"><div class="cursor-pointer">`);
+        if (unref(avatarUrl)) {
+          _push(`<div class="relative"><img${ssrRenderAttr("src", unref(avatarUrl))}${ssrRenderAttr("alt", unref(userDisplayName))} class="h-10 w-10 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 hover:ring-primary-500 transition-all duration-200"></div>`);
+        } else {
+          _push(`<div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ring-2 ring-gray-200 dark:ring-gray-600 hover:ring-primary-500 transition-all duration-200"><span class="text-white text-sm font-medium">${ssrInterpolate(unref(userInitials))}</span></div>`);
+        }
+        _push(`</div>`);
         if (unref(showUserMenu)) {
-          _push(`<div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"><div class="p-3"><div class="flex items-center justify-between py-2"><div class="flex items-center">`);
+          _push(`<div class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"><div class="p-4"><div class="pb-3 border-b border-gray-200 dark:border-gray-700"><p class="text-sm font-medium text-gray-900 dark:text-white truncate">${ssrInterpolate(unref(userDisplayName))}</p><p class="text-xs text-gray-500 dark:text-gray-400 truncate">${ssrInterpolate(unref(userEmail))}</p></div><div class="pt-3"><div class="flex items-center justify-between py-2"><div class="flex items-center">`);
           _push(ssrRenderComponent(_component_UIcon, {
             name: "lucide:moon",
             class: "h-4 w-4 text-gray-500 mr-2"
@@ -625,7 +565,7 @@ const _sfc_main$1 = /* @__PURE__ */ defineComponent({
             }),
             _: 1
           }, _parent));
-          _push(`</div></div>`);
+          _push(`</div></div></div>`);
         } else {
           _push(`<!---->`);
         }
@@ -680,4 +620,4 @@ _sfc_main.setup = (props, ctx) => {
 const _default = /* @__PURE__ */ _export_sfc(_sfc_main, [["ssrRender", _sfc_ssrRender]]);
 
 export { _default as default };
-//# sourceMappingURL=default-BY50yKXB.mjs.map
+//# sourceMappingURL=default-CxSAQJBH.mjs.map

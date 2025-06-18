@@ -8,22 +8,22 @@ export default defineNuxtPlugin({
             // Import Clerk composables
             const { isLoaded } = useAuth()
 
-            // Don't block the app - just log when Clerk is ready
+            // Don't block the app - just check when Clerk is ready
             watch(isLoaded, (loaded) => {
                 if (loaded) {
-                    console.log('Clerk is ready!')
+                    // Clerk is ready
                 }
             }, { immediate: true })
 
             // Set a reasonable timeout and continue regardless
             setTimeout(() => {
                 if (!isLoaded.value) {
-                    console.warn('Clerk took longer than expected to load, but continuing...')
+                    // Clerk took longer than expected to load, but continuing
                 }
             }, 3000)
 
-        } catch (error) {
-            console.warn('Clerk initialization failed:', error)
+        } catch {
+            // Clerk initialization failed
         }
     }
 }) 

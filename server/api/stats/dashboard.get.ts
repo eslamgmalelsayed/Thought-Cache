@@ -13,8 +13,7 @@ export default defineEventHandler(async () => {
         return {
             data: stats
         }
-    } catch (error) {
-        console.error('Error fetching dashboard stats:', error)
+    } catch {
         throw createError({
             statusCode: 500,
             statusMessage: 'Failed to fetch dashboard statistics'

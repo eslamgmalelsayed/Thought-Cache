@@ -28,7 +28,6 @@ const dashboard_get = defineEventHandler(async () => {
       data: stats
     };
   } catch (error) {
-    console.error("Error fetching dashboard stats:", error);
     throw createError({
       statusCode: 500,
       statusMessage: "Failed to fetch dashboard statistics"

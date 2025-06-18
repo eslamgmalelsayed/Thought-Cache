@@ -1,4 +1,4 @@
-import { d as defineEventHandler, a as useRuntimeConfig, c as createError } from '../../_/nitro.mjs';
+import { d as defineEventHandler, a as useRuntimeConfig, b as getRouterParam, c as createError } from '../../../_/nitro.mjs';
 import { createClient } from '@supabase/supabase-js';
 import 'node:http';
 import 'node:https';
@@ -15,35 +15,43 @@ import '@clerk/shared/underscore';
 import 'node:fs';
 import 'node:path';
 
-const index_get = defineEventHandler(async (_event) => {
+const _id__delete = defineEventHandler(async (event) => {
   try {
     const config = useRuntimeConfig();
     const supabase = createClient(
       config.public.supabaseUrl,
       config.public.supabaseAnonKey
     );
-    const { data: thoughts, error } = await supabase.from("thoughts").select("*");
+    const thoughtId = getRouterParam(event, "id");
+    if (!thoughtId) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Thought ID is required"
+      });
+    }
+    const { error } = await supabase.from("thoughts").delete().eq("id", thoughtId);
     if (error) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Failed to fetch thoughts",
+        statusMessage: `Failed to delete thought: ${error.message}`,
         data: error
       });
     }
     return {
       success: true,
-      data: thoughts || [],
-      meta: {
-        total: (thoughts == null ? void 0 : thoughts.length) || 0
-      }
+      message: "Thought deleted successfully"
     };
   } catch (error) {
+    if (error.statusCode) {
+      throw error;
+    }
     throw createError({
       statusCode: 500,
-      statusMessage: "Internal server error"
+      statusMessage: "Internal server error",
+      data: error
     });
   }
 });
 
-export { index_get as default };
-//# sourceMappingURL=index.get.mjs.map
+export { _id__delete as default };
+//# sourceMappingURL=_id_.delete.mjs.map

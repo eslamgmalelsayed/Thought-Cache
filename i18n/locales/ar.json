@@ -29,6 +29,15 @@
     "favorite": "مفضلة",
     "search": "البحث في الأفكار...",
     "empty": "لا توجد أفكار بعد. ابدأ بإضافة فكرتك الأولى!",
+    "recent": "الأفكار الحديثة",
+    "searchResults": "نتائج البحث",
+    "thoughtSingle": "فكرة",
+    "thoughtPlural": "أفكار",
+    "all": "الكل",
+    "favorites": "المفضلة",
+    "noResults": "لم يتم العثور على أفكار",
+    "tryAdjusting": "حاول تعديل البحث أو المرشحات",
+    "startAdding": "ابدأ بإضافة فكرتك الرائعة الأولى!",
     "form": {
       "title": "العنوان",
       "content": "المحتوى",
@@ -66,11 +75,16 @@
     "error": "حدث خطأ",
     "success": "نجح!",
     "confirm": "هل أنت متأكد؟",
+    "loadMore": "تحميل المزيد",
     "theme": {
       "light": "فاتح",
       "dark": "داكن",
       "system": "النظام"
     }
+  },
+  "stats": {
+    "thisMonth": "هذا الشهر",
+    "tagsUsed": "العلامات المستخدمة"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

@@ -274,8 +274,6 @@ const handleSubmit = () => {
 
   if (isValid) {
     emit("submit", { ...formData.value });
-  } else {
-    console.log("Form validation failed, not submitting");
   }
 };
 

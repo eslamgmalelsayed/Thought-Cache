@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     // Show loading state for route transitions
     if (from && to.path !== from.path) {
         // You can emit loading events here or set loading state
-        console.log(`Navigating from ${from.path} to ${to.path}`)
+        // Navigating between pages
     }
 
     // You can add loading logic here

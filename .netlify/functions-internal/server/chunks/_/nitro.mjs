@@ -954,6 +954,20 @@ function isError(input) {
 function getQuery(event) {
   return getQuery$1(event.path || "");
 }
+function getRouterParams(event, opts = {}) {
+  let params = event.context.params || {};
+  if (opts.decode) {
+    params = { ...params };
+    for (const key in params) {
+      params[key] = decode$1(params[key]);
+    }
+  }
+  return params;
+}
+function getRouterParam(event, name, opts = {}) {
+  const params = getRouterParams(event, opts);
+  return params[name];
+}
 function isMethod(event, expected, allowHead) {
   if (typeof expected === "string") {
     if (event.method === expected) {
@@ -1012,6 +1026,7 @@ function getRequestURL(event, opts = {}) {
 }
 
 const RawBodySymbol = Symbol.for("h3RawBody");
+const ParsedBodySymbol = Symbol.for("h3ParsedBody");
 const PayloadMethods$1 = ["PATCH", "POST", "PUT", "DELETE"];
 function readRawBody(event, encoding = "utf8") {
   assertMethod(event, PayloadMethods$1);
@@ -1079,6 +1094,26 @@ function readRawBody(event, encoding = "utf8") {
   const result = encoding ? promise.then((buff) => buff.toString(encoding)) : promise;
   return result;
 }
+async function readBody(event, options = {}) {
+  const request = event.node.req;
+  if (hasProp(request, ParsedBodySymbol)) {
+    return request[ParsedBodySymbol];
+  }
+  const contentType = request.headers["content-type"] || "";
+  const body = await readRawBody(event);
+  let parsed;
+  if (contentType === "application/json") {
+    parsed = _parseJSON(body, options.strict ?? true);
+  } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
+    parsed = _parseURLEncodedBody(body);
+  } else if (contentType.startsWith("text/")) {
+    parsed = body;
+  } else {
+    parsed = _parseJSON(body, options.strict ?? false);
+  }
+  request[ParsedBodySymbol] = parsed;
+  return parsed;
+}
 function getRequestWebStream(event) {
   if (!PayloadMethods$1.includes(event.method)) {
     return;
@@ -1112,6 +1147,35 @@ function getRequestWebStream(event) {
       });
     }
   });
+}
+function _parseJSON(body = "", strict) {
+  if (!body) {
+    return void 0;
+  }
+  try {
+    return destr(body, { strict });
+  } catch {
+    throw createError$1({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Invalid JSON body"
+    });
+  }
+}
+function _parseURLEncodedBody(body) {
+  const form = new URLSearchParams(body);
+  const parsedForm = /* @__PURE__ */ Object.create(null);
+  for (const [key, value] of form.entries()) {
+    if (hasProp(parsedForm, key)) {
+      if (!Array.isArray(parsedForm[key])) {
+        parsedForm[key] = [parsedForm[key]];
+      }
+      parsedForm[key].push(value);
+    } else {
+      parsedForm[key] = value;
+    }
+  }
+  return parsedForm;
 }
 
 function handleCacheHeaders(event, opts) {
@@ -4431,7 +4495,7 @@ function _expandFromEnv(value) {
 const _inlineRuntimeConfig = {
   "app": {
     "baseURL": "/",
-    "buildId": "e8cec72b-6eb8-45f6-b097-1e41e86382f4",
+    "buildId": "89093596-dfa6-49b4-83b2-4c9b67f1ff16",
     "buildAssetsDir": "/_nuxt/",
     "cdnURL": ""
   },
@@ -4464,7 +4528,7 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
-    "clerkPublishableKey": "",
+    "clerkPublishableKey": "pk_test_dG9waWNhbC1nbGlkZXItOTEuY2xlcmsuYWNjb3VudHMuZGV2JA",
     "supabaseUrl": "https://fyujwfgkhrnngfzmtsqs.supabase.co",
     "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5dWp3ZmdraHJubmdmem10c3FzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1NDgyODksImV4cCI6MjA2NDEyNDI4OX0.ogAVbekWPBoBwPntcnL_G9fcRi5n1YnFburU-tIayBo",
     "clerk": {
@@ -5198,13 +5262,19 @@ var middleware_default = clerkMiddleware();
 const _SxA8c9 = defineEventHandler(() => {});
 
 const _lazy_ok0TVe = () => import('../routes/api/stats/dashboard.get.mjs');
+const _lazy_sR0rbl = () => import('../routes/api/thoughts/_id_.delete.mjs');
+const _lazy_qvm9mL = () => import('../routes/api/thoughts/_id_.put.mjs');
 const _lazy_pYsIgS = () => import('../routes/api/index.get.mjs');
+const _lazy_nccI9b = () => import('../routes/api/index.post.mjs');
 const _lazy_RWhkqZ = () => import('../routes/renderer.mjs').then(function (n) { return n.r; });
 
 const handlers = [
   { route: '', handler: _GvvEO9, lazy: false, middleware: true, method: undefined },
   { route: '/api/stats/dashboard', handler: _lazy_ok0TVe, lazy: true, middleware: false, method: "get" },
+  { route: '/api/thoughts/:id', handler: _lazy_sR0rbl, lazy: true, middleware: false, method: "delete" },
+  { route: '/api/thoughts/:id', handler: _lazy_qvm9mL, lazy: true, middleware: false, method: "put" },
   { route: '/api/thoughts', handler: _lazy_pYsIgS, lazy: true, middleware: false, method: "get" },
+  { route: '/api/thoughts', handler: _lazy_nccI9b, lazy: true, middleware: false, method: "post" },
   { route: '/__nuxt_error', handler: _lazy_RWhkqZ, lazy: true, middleware: false, method: undefined },
   { route: '/api/_nuxt_icon/:collection', handler: _5mZBJj, lazy: false, middleware: false, method: undefined },
   { route: '', handler: middleware_default, lazy: false, middleware: true, method: undefined },
@@ -5350,5 +5420,5 @@ function useNitroApp() {
 }
 runNitroPlugins(nitroApp);
 
-export { $fetch$1 as $, getRequestProtocol as A, destr as B, getRequestHeaders as C, getRequestHeader as D, setCookie as E, getCookie as F, deleteCookie as G, useRuntimeConfig as a, buildAssetsURL as b, createError$1 as c, defineEventHandler as d, getResponseStatusText as e, getResponseStatus as f, getRouteRulesForPath as g, defineRenderHandler as h, getQuery as i, joinHeaders as j, getRouteRules as k, klona as l, defuFn as m, normalizeCookieHeader as n, defu as o, publicAssetsURL as p, sanitizeStatusCode as q, isEqual as r, serialize$1 as s, getContext as t, useNitroApp as u, baseURL as v, createHooks as w, executeAsync as x, toRouteMatcher as y, createRouter$1 as z };
+export { $fetch$1 as $, toRouteMatcher as A, createRouter$1 as B, getRequestProtocol as C, destr as D, getRequestHeaders as E, getRequestHeader as F, setCookie as G, getCookie as H, deleteCookie as I, useRuntimeConfig as a, getRouterParam as b, createError$1 as c, defineEventHandler as d, buildAssetsURL as e, getResponseStatusText as f, getRouteRulesForPath as g, getResponseStatus as h, defineRenderHandler as i, joinHeaders as j, getQuery as k, getRouteRules as l, klona as m, normalizeCookieHeader as n, defuFn as o, publicAssetsURL as p, defu as q, readBody as r, serialize$1 as s, sanitizeStatusCode as t, useNitroApp as u, isEqual as v, getContext as w, baseURL as x, createHooks as y, executeAsync as z };
 //# sourceMappingURL=nitro.mjs.map

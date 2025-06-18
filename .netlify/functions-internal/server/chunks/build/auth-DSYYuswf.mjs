@@ -1,4 +1,4 @@
-import { m as defineNuxtRouteMiddleware } from './server.mjs';
+import { n as defineNuxtRouteMiddleware } from './server.mjs';
 import 'vue';
 import '../_/nitro.mjs';
 import 'node:http';
@@ -32,9 +32,9 @@ import 'devalue';
 import 'unhead/utils';
 import 'unhead/plugins';
 
-const loading = defineNuxtRouteMiddleware((to, from) => {
+const auth = defineNuxtRouteMiddleware(async () => {
   return;
 });
 
-export { loading as default };
-//# sourceMappingURL=loading-BDZbEAnI.mjs.map
+export { auth as default };
+//# sourceMappingURL=auth-DSYYuswf.mjs.map

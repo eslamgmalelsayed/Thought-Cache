@@ -75,7 +75,7 @@ export default defineNuxtConfig({
 
     // Public keys (exposed to client-side)
     public: {
-      clerkPublishableKey: process.env.NUXT_CLERK_PUBLISHABLE_KEY,
+      clerkPublishableKey: process.env.NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.NUXT_CLERK_PUBLISHABLE_KEY,
       supabaseUrl: process.env.NUXT_SUPABASE_URL,
       supabaseAnonKey: process.env.NUXT_SUPABASE_ANON_KEY
     }

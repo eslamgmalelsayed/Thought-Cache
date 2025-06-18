@@ -48,7 +48,6 @@ const isOpen = computed({
 
 // Methods
 const handleSubmit = (data) => {
-  console.log("ThoughtModal: Form submitted with data:", data);
   emit("submit", data);
 };
 

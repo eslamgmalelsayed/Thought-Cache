@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
 
     // Skip Supabase initialization if credentials are not available
     if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your_supabase_project_url') {
-        console.warn('Supabase credentials not found or not configured - skipping initialization')
+        // Supabase credentials not found or not configured - skipping initialization
         return {
             provide: {
                 supabase: null
@@ -24,8 +24,8 @@ export default defineNuxtPlugin(() => {
                 supabase
             }
         }
-    } catch (error) {
-        console.error('Failed to initialize Supabase client:', error)
+    } catch {
+        // Failed to initialize Supabase client
         return {
             provide: {
                 supabase: null

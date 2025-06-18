@@ -35,10 +35,9 @@ export default defineNuxtRouteMiddleware(async () => {
 
             // Very short timeout - don't block the app
             timeoutId = setTimeout(() => {
-                console.warn('Auth check timeout, allowing navigation')
                 cleanup()
                 resolve()
-            }, 2000) // Only 2 seconds
+            }, 1000) // Only 1 second
         })
 
         // Final check after waiting
@@ -46,8 +45,7 @@ export default defineNuxtRouteMiddleware(async () => {
             return navigateTo('/sign-in')
         }
 
-    } catch (error) {
-        // If auth check fails, log and allow navigation (fail open)
-        console.warn('Auth middleware error:', error)
+    } catch {
+        // If auth check fails, allow navigation (fail open)
     }
 }) 

@@ -29,6 +29,15 @@
     "favorite": "Favorite",
     "search": "Search thoughts...",
     "empty": "No thoughts yet. Start by adding your first idea!",
+    "recent": "Recent Thoughts",
+    "searchResults": "Search Results",
+    "thoughtSingle": "thought",
+    "thoughtPlural": "thoughts",
+    "all": "All",
+    "favorites": "Favorites",
+    "noResults": "No thoughts found",
+    "tryAdjusting": "Try adjusting your search or filters",
+    "startAdding": "Start by adding your first brilliant idea!",
     "form": {
       "title": "Title",
       "content": "Content",
@@ -66,11 +75,16 @@
     "error": "An error occurred",
     "success": "Success!",
     "confirm": "Are you sure?",
+    "loadMore": "Load More",
     "theme": {
       "light": "Light",
       "dark": "Dark",
       "system": "System"
     }
+  },
+  "stats": {
+    "thisMonth": "This Month",
+    "tagsUsed": "Tags Used"
   },
   "validation": {
     "required": "This field is required",
